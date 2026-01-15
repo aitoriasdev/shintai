@@ -1,0 +1,113 @@
+{
+  "chat.tools.terminal.outputLocation": "none",
+  "css.format.spaceAroundSelectorSeparator": true,
+  "debug.breakpointsView.presentation": "tree",
+  "debug.javascript.terminalOptions": {
+    "outFiles": [
+      "${workspaceFolder}/out/**/*.js",
+      "${workspaceFolder}/build/**/*.js"
+    ]
+  },
+  "editor.aiStats.enabled": true,
+  "editor.experimental.asyncTokenization": true,
+  "editor.experimental.asyncTokenizationVerification": true,
+  "editor.fontFamily": "'Cascadia Code PL', 'JetBrains Mono', 'Dank Mono', Consolas, 'Courier New', monospace",
+  "editor.fontLigatures": true,
+  "[plaintext]": {
+    "files.insertFinalNewline": false
+  },
+  "[github-issues]": {
+    "editor.wordWrap": "on"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "editor.formatOnSave": true
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "editor.formatOnSave": true
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "editor.formatOnSave": true
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "editor.formatOnSave": true
+  },
+  "emmet.excludeLanguages": [],
+  "eslint.useFlatConfig": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "files.exclude": {
+    ".git": true,
+    ".build": true,
+    "**/.DS_Store": true,
+    "build/**/*.js.map": true,
+    "build/**/*.js": {
+      "when": "$(basename).ts"
+    }
+  },
+  "files.insertFinalNewline": true,
+  "files.readonlyInclude": {
+    "**/node_modules/**/*.*": true,
+    "**/yarn.lock": true,
+    "**/package-lock.json": true,
+    "out/**": true,
+    "out-build/**": true,
+    "test/smoke/out/**": true,
+    "test/automation/out/**": true,
+    "test/integration/browser/out/**": true
+  },
+  "files.trimTrailingWhitespace": true,
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/bazel-out/**": true,
+    "**/dist/**": true
+  },
+  "git.autofetch": true,
+  "git.branchProtection": ["main", "main-*", "distro", "release/*"],
+  "git.branchProtectionPrompt": "alwaysCommitToNewBranch",
+  "git.branchRandomName.enable": true,
+  "git.confirmSync": false,
+  "git.diagnosticsCommitHook.enabled": true,
+  "git.diagnosticsCommitHook.sources": {
+    "*": "error",
+    "ts": "warning",
+    "eslint": "warning"
+  },
+  "git.ignoreLimitWarning": true,
+  "git.mergeEditor": true,
+  "git.pullBeforeCheckout": true,
+  "githubPullRequests.assignCreated": "${user}",
+  "githubPullRequests.codingAgent.enabled": true,
+  "githubPullRequests.codingAgent.uiIntegration": true,
+  "githubPullRequests.defaultMergeMethod": "squash",
+  "githubPullRequests.ignoredPullRequestBranches": ["main"],
+  "inlineChat.enableV2": true,
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "cli/target/**": true,
+    ".build/**": true,
+    ".history": true,
+    "out/**": true,
+    "out-build/**": true,
+    "i18n/**": true,
+    "test/smoke/out/**": true,
+    "test/automation/out/**": true,
+    "test/integration/browser/out/**": true
+  },
+  "typescript.implementationsCodeLens.enabled": true,
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.preferences.quoteStyle": "single",
+  "typescript.tsc.autoDetect": "off",
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "chat.mcp.gallery.enabled": true
+}
