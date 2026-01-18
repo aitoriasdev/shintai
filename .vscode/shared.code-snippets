@@ -1,6 +1,6 @@
 {
   "Aitorias Copyright Header": {
-    "scope": "javascript,typescript,css,rust",
+    "scope": "javascript,typescript,css",
     "prefix": ["header", "stub", "copyright"],
     "body": [
       "/*---------------------------------------------------------------------------------------------",
