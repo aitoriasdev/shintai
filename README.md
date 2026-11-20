@@ -38,7 +38,7 @@ yarn dev        # UI: http://localhost:5173 (proxies /api to the API on :4321)
 | `SHINTAI_PORT`    | `4321`             | API (and production UI) port  |
 | `SHINTAI_DB_PATH` | `./data/shintai.db` | SQLite database file         |
 
-The server only binds to `127.0.0.1`, so it is never reachable from other machines.
+The server only binds to `127.0.0.1`, so it is never reachable from other machines. It also rejects requests that other websites could send from your browser while it runs: non-loopback `Host` headers (DNS rebinding), cross-site writes (CSRF) and non-JSON request bodies.
 
 ## Scripts
 

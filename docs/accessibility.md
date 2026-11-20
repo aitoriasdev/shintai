@@ -32,7 +32,7 @@ The initial build was audited with axe and a manual review of every component. A
 
 | # | Finding | WCAG | Severity | Fix |
 | --- | --- | --- | --- | --- |
-| 1 | Focus could leave the open dialog and reach the page behind it | 2.4.3, 4.1.2 | 🔴 Critical | The app root gets the `inert` attribute while a dialog is open; focus returns to the opener on close |
+| 1 | Focus could leave the open dialog and reach the page behind it | 2.4.3, 4.1.2 | 🔴 Critical | The app root gets the `inert` attribute while a dialog is open; focus returns to the opener on close, or to the main content if the opener was removed |
 | 2 | Score picker and status filter were `role="radio"` buttons without arrow-key support | 2.1.1, 4.1.2 | 🔴 Critical | Rebuilt as native radio groups inside a `fieldset` with a `legend` |
 | 3 | No way to bypass the header | 2.4.1 | 🟡 Major | "Skip to main content" link as the first tab stop |
 | 4 | Input/select borders at 1.3:1 | 1.4.11 | 🟡 Major | `--color-control` token (≥ 3.2:1) for all interactive boundaries |
@@ -50,11 +50,22 @@ The initial build was audited with axe and a manual review of every component. A
 | 16 | CSS hover/skeleton animations ignored reduced motion | 2.3.3 (AAA), best practice | 🟢 Minor | Global `prefers-reduced-motion` override; Motion uses `reducedMotion="user"` |
 | 17 | "Show more" did not expose its state; external link did not say it opens a new tab | 4.1.2, 3.2.5 | 🟢 Minor | `aria-expanded` + `aria-controls`; "(opens in a new tab)" text |
 
+### Follow-up code review
+
+A code review of the full PR stack found three more accessibility issues. All are fixed and regression-tested.
+
+| # | Finding | WCAG | Severity | Fix |
+| --- | --- | --- | --- | --- |
+| 18 | While a dialog was open, the error toast and live region were inside the inert app root: errors were neither announced nor dismissible | 4.1.3, 3.3.1 | 🔴 Critical | `LiveAnnouncer` and `ErrorToast` portal to `<body>`, outside the inert root |
+| 19 | Focus fell back to `<body>` when the focused card disappeared (e.g. un-favoriting under the "Favorites" filter) | 2.4.3 | 🟡 Major | The grid moves focus to the card that took its place, or to the page heading |
+| 20 | The `/` shortcut was ignored while a radio button had focus | 2.1.1 | 🟢 Minor | Only text-entry fields suppress shortcuts |
+
 ## Conventions for new UI
 
 - Prefer native elements: `<button>`, `<a>`, `<select>`, radio inputs in a `fieldset`. Reach for ARIA only when no native element fits.
 - Toggles keep a constant name and expose state with `aria-pressed`. Name per-item controls with their context (`IconButton`'s `context` prop).
 - Interactive boundaries use `border-control`; never encode state in hue alone.
 - Interactive controls are at least 36 px (44 px on touch screens through `pointer-coarse:`). This exceeds WCAG 2.2's 24 px minimum (2.5.8) and meets the 44 px AAA target on touch.
-- Announce asynchronous results with `announce()`. Report failures with `showError()`.
+- Announce asynchronous results with `announce()`. Report failures with `showError()`. Global live regions must live outside the app root, which dialogs make inert.
+- When an interaction can remove the focused element, move focus somewhere sensible (see `useFocusRecovery` in the game grid).
 - Every new page or dialog gets an `expectAccessible(page)` check in its `*.e2e.ts`.
