@@ -2425,6 +2425,7 @@ __metadata:
     vite: "npm:^8.3.8"
     vitest: "npm:^5.1.1"
     vitest-browser-react: "npm:^2.3.0"
+    zod: "npm:^4.6.7"
   languageName: unknown
   linkType: soft
 

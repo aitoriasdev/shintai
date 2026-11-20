@@ -1,6 +1,9 @@
 import { container as rootContainer, type DependencyContainer } from 'tsyringe'
 import type { AppConfig } from './config'
 import { openDatabase } from './database/database'
+import { GameCatalogService } from './games/game-catalog-service'
+import { GameDetailsCache } from './games/game-details-cache'
+import { WikipediaClient } from './games/wikipedia-client'
 import { TOKENS, type Clock, type FetchFn } from './tokens'
 
 const systemClock: Clock = { now: () => Date.now() }
@@ -17,5 +20,8 @@ export function createContainer(config: AppConfig, overrides: { clock?: Clock; f
   container.register(TOKENS.Clock, { useValue: overrides.clock ?? systemClock })
   container.register(TOKENS.Fetch, { useValue: overrides.fetch ?? globalThis.fetch.bind(globalThis) })
 
+  container.registerSingleton(WikipediaClient)
+  container.registerSingleton(GameDetailsCache)
+  container.registerSingleton(GameCatalogService)
   return container
 }
