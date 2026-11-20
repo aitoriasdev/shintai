@@ -35,6 +35,17 @@ test('filters, searches and removes library games', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'My library (1 game)' })).toBeVisible()
 })
 
+test('keeps keyboard focus when a card leaves the filtered view (2.4.3)', async ({ page }) => {
+  await page.getByRole('radio', { name: 'Favorites' }).check()
+  await expect(page.getByRole('listitem')).toHaveCount(1)
+
+  await page.getByRole('button', { name: 'Favorite: Celeste' }).focus()
+  await page.keyboard.press('Enter')
+
+  await expect(page.getByRole('heading', { name: 'No games match these filters' })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: 'My library' })).toBeFocused()
+})
+
 test('exports and re-imports a backup', async ({ page }) => {
   const downloadPromise = page.waitForEvent('download')
   await page.getByRole('link', { name: 'Export library backup' }).click()

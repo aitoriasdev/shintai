@@ -40,3 +40,50 @@ it('asks for more games when the end of the grid is visible', async () => {
   await renderWithProviders(<GameGrid label="Results" games={[celeste]} onOpen={vi.fn()} hasMore onLoadMore={onLoadMore} />)
   await vi.waitFor(() => expect(onLoadMore).toHaveBeenCalled())
 })
+
+it('moves focus to the next card when the focused card is removed (2.4.3)', async () => {
+  vi.spyOn(window, 'fetch').mockImplementation(fakeApi(() => Response.json([])))
+  const outerWilds = makeGame({ id: 'Q3', pageId: 3, title: 'Outer Wilds' })
+  const screen = await renderWithProviders(<GameGrid label="Results" games={[celeste, hades, outerWilds]} onOpen={vi.fn()} />)
+
+  ;(screen.getByRole('button', { name: 'Favorite: Hades' }).element() as HTMLElement).focus()
+  await screen.rerender(<GameGrid label="Results" games={[celeste, outerWilds]} onOpen={vi.fn()} />)
+  await expect.element(screen.getByRole('button', { name: 'Outer Wilds', exact: true })).toHaveFocus()
+
+  await screen.rerender(<GameGrid label="Results" games={[celeste]} onOpen={vi.fn()} />)
+  await expect.element(screen.getByRole('button', { name: 'Celeste', exact: true })).toHaveFocus()
+})
+
+it('falls back to the page heading when the grid disappears while focused', async () => {
+  vi.spyOn(window, 'fetch').mockImplementation(fakeApi(() => Response.json([])))
+  const page = (games: typeof celeste[] | null) => (
+    <main>
+      <h1 tabIndex={-1}>My library</h1>
+      {games && <GameGrid label="Results" games={games} onOpen={vi.fn()} />}
+    </main>
+  )
+  const screen = await renderWithProviders(page([celeste]))
+
+  ;(screen.getByRole('button', { name: 'Celeste', exact: true }).element() as HTMLElement).focus()
+  await screen.rerender(page(null))
+  await expect.element(screen.getByRole('heading', { name: 'My library' })).toHaveFocus()
+})
+
+it('does not steal focus that moved elsewhere on purpose', async () => {
+  vi.spyOn(window, 'fetch').mockImplementation(fakeApi(() => Response.json([])))
+  const screen = await renderWithProviders(
+    <>
+      <input aria-label="Elsewhere" />
+      <GameGrid label="Results" games={[celeste, hades]} onOpen={vi.fn()} />
+    </>,
+  )
+  ;(screen.getByRole('button', { name: 'Hades', exact: true }).element() as HTMLElement).focus()
+  await screen.getByRole('textbox', { name: 'Elsewhere' }).click()
+  await screen.rerender(
+    <>
+      <input aria-label="Elsewhere" />
+      <GameGrid label="Results" games={[celeste]} onOpen={vi.fn()} />
+    </>,
+  )
+  await expect.element(screen.getByRole('textbox', { name: 'Elsewhere' })).toHaveFocus()
+})
