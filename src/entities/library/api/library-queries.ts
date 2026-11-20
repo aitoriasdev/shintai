@@ -31,26 +31,62 @@ export function useLibraryEntry(gameId: string): LibraryEntry | undefined {
   }).data
 }
 
-/**
- * Optimistically writes to the cache, rolls back on failure and re-syncs with the server once the
- * last concurrent library mutation settles (avoids flicker when toggling quickly).
- */
-async function optimistic(queryClient: QueryClient, update: (entries: LibraryEntry[]) => LibraryEntry[]) {
-  await queryClient.cancelQueries({ queryKey: LIBRARY_KEY })
-  const previous = queryClient.getQueryData<LibraryEntry[]>(LIBRARY_KEY)
-  queryClient.setQueryData<LibraryEntry[]>(LIBRARY_KEY, (entries = []) => update(entries))
-  return { previous }
+type LibraryChange = { kind: 'upsert'; game: GameSummary; patch: EntryPatch } | { kind: 'remove'; gameId: string }
+type MutationContext = { change: LibraryChange }
+
+function applyChange(entries: LibraryEntry[], change: LibraryChange): LibraryEntry[] {
+  return change.kind === 'upsert' ? applyPatch(entries, change.game, change.patch, Date.now()) : withoutEntry(entries, change.gameId)
 }
 
-function rollback(queryClient: QueryClient, context: { previous?: LibraryEntry[] } | undefined) {
-  queryClient.setQueryData(LIBRARY_KEY, context?.previous)
+function withServerEntry(entries: LibraryEntry[], entry: LibraryEntry): LibraryEntry[] {
+  const index = entries.findIndex((e) => e.game.id === entry.game.id)
+  return index === -1 ? [entry, ...entries] : entries.map((e, i) => (i === index ? entry : e))
+}
+
+/**
+ * Optimistic updates for a chain of (serialized) library writes. The chain remembers the last state
+ * the server confirmed; the cache always shows that state plus the changes still in flight. A failed
+ * write is dropped by recomputing from the confirmed state — restoring per-mutation snapshots would
+ * resurrect earlier failed changes when several writes fail in a row.
+ */
+const chains = new WeakMap<QueryClient, { confirmed: LibraryEntry[] | undefined }>()
+
+async function optimistic(queryClient: QueryClient, change: LibraryChange): Promise<MutationContext> {
+  // Read synchronously, before any await, so the first write of a chain captures the pre-optimistic state.
+  if (!chains.has(queryClient)) chains.set(queryClient, { confirmed: queryClient.getQueryData<LibraryEntry[]>(LIBRARY_KEY) })
+  await queryClient.cancelQueries({ queryKey: LIBRARY_KEY })
+  queryClient.setQueryData<LibraryEntry[]>(LIBRARY_KEY, (entries = []) => applyChange(entries, change))
+  return { change }
+}
+
+/** Shows the confirmed state plus the optimistic changes of writes still pending (except `settled`). */
+function recompute(queryClient: QueryClient, settled: MutationContext | undefined) {
+  const confirmed = chains.get(queryClient)?.confirmed
+  if (!confirmed) return
+  const pending = queryClient
+    .getMutationCache()
+    .findAll({ mutationKey: LIBRARY_KEY, status: 'pending' })
+    .map((mutation) => mutation.state.context as MutationContext | undefined)
+    .filter((context): context is MutationContext => context !== undefined && context !== settled)
+  queryClient.setQueryData(LIBRARY_KEY, pending.reduce((entries, { change }) => applyChange(entries, change), confirmed))
+}
+
+function confirm(queryClient: QueryClient, update: (confirmed: LibraryEntry[]) => LibraryEntry[]) {
+  const chain = chains.get(queryClient)
+  if (chain?.confirmed) chain.confirmed = update(chain.confirmed)
+}
+
+function fail(queryClient: QueryClient, context: MutationContext | undefined) {
+  recompute(queryClient, context)
   showError('Could not save your change, so it was undone. Is the Shintai API running?')
 }
 
-function settle(queryClient: QueryClient) {
-  if (queryClient.isMutating({ mutationKey: LIBRARY_KEY }) === 1) {
-    return queryClient.invalidateQueries({ queryKey: LIBRARY_KEY })
-  }
+/** When the last write of a chain settles, show exactly what the server confirmed, then re-sync. */
+function settle(queryClient: QueryClient, context: MutationContext | undefined) {
+  if (queryClient.isMutating({ mutationKey: LIBRARY_KEY }) !== 1) return
+  recompute(queryClient, context)
+  chains.delete(queryClient)
+  return queryClient.invalidateQueries({ queryKey: LIBRARY_KEY })
 }
 
 export function useUpsertEntry() {
@@ -59,9 +95,10 @@ export function useUpsertEntry() {
     mutationKey: LIBRARY_KEY,
     scope: LIBRARY_MUTATION_SCOPE,
     mutationFn: ({ game, patch }: { game: GameSummary; patch: EntryPatch }) => upsertEntry(game, patch),
-    onMutate: ({ game, patch }) => optimistic(queryClient, (entries) => applyPatch(entries, game, patch, Date.now())),
-    onError: (_error, _variables, context) => rollback(queryClient, context),
-    onSettled: () => settle(queryClient),
+    onMutate: ({ game, patch }) => optimistic(queryClient, { kind: 'upsert', game, patch }),
+    onSuccess: (entry) => confirm(queryClient, (confirmed) => withServerEntry(confirmed, entry)),
+    onError: (_error, _variables, context) => fail(queryClient, context),
+    onSettled: (_data, _error, _variables, context) => settle(queryClient, context),
   })
 }
 
@@ -71,8 +108,9 @@ export function useRemoveEntry() {
     mutationKey: LIBRARY_KEY,
     scope: LIBRARY_MUTATION_SCOPE,
     mutationFn: (gameId: string) => removeEntry(gameId),
-    onMutate: (gameId) => optimistic(queryClient, (entries) => withoutEntry(entries, gameId)),
-    onError: (_error, _variables, context) => rollback(queryClient, context),
-    onSettled: () => settle(queryClient),
+    onMutate: (gameId) => optimistic(queryClient, { kind: 'remove', gameId }),
+    onSuccess: (_data, gameId) => confirm(queryClient, (confirmed) => withoutEntry(confirmed, gameId)),
+    onError: (_error, _variables, context) => fail(queryClient, context),
+    onSettled: (_data, _error, _variables, context) => settle(queryClient, context),
   })
 }

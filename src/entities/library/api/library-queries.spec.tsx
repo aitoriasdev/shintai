@@ -79,3 +79,49 @@ it('sends library writes one at a time, in order', async () => {
 
   await vi.waitFor(() => expect(events).toEqual(['start 4', 'end 4', 'start 3', 'end 3']))
 })
+
+function FavoriteThenComplete() {
+  const upsert = useUpsertEntry()
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        upsert.mutate({ game: makeGame(), patch: { favorite: true } })
+        upsert.mutate({ game: makeGame(), patch: { completed: true } })
+      }}
+    >
+      favorite then complete
+    </button>
+  )
+}
+
+it('never leaves a failed change on screen when several writes fail and the API stays down', async () => {
+  vi.spyOn(window, 'fetch').mockImplementation(fakeApi(() => Response.json({ error: 'down' }, { status: 503 })))
+  const screen = await renderWithProviders(<FavoriteThenComplete />)
+  const original = [makeEntry()]
+  screen.queryClient.setQueryData<LibraryEntry[]>(libraryQueries.list().queryKey, original)
+
+  await screen.getByRole('button', { name: 'favorite then complete' }).click()
+
+  await vi.waitFor(() => expect(screen.queryClient.isMutating()).toBe(0))
+  await vi.waitFor(() => expect(screen.queryClient.isFetching()).toBe(0))
+  expect(screen.queryClient.getQueryData<LibraryEntry[]>(['library'])).toEqual(original)
+})
+
+it('keeps changes the server confirmed when a later write fails', async () => {
+  vi.spyOn(window, 'fetch').mockImplementation(
+    fakeApi(({ method, body }) => {
+      if (method !== 'PUT') return Response.json({ error: 'down' }, { status: 503 })
+      const { patch } = body as { patch: Partial<LibraryEntry> }
+      return patch.favorite ? Response.json(makeEntry({ favorite: true })) : Response.json({ error: 'down' }, { status: 503 })
+    }),
+  )
+  const screen = await renderWithProviders(<FavoriteThenComplete />)
+  screen.queryClient.setQueryData<LibraryEntry[]>(libraryQueries.list().queryKey, [makeEntry()])
+
+  await screen.getByRole('button', { name: 'favorite then complete' }).click()
+
+  await vi.waitFor(() => expect(screen.queryClient.isMutating()).toBe(0))
+  await vi.waitFor(() => expect(screen.queryClient.isFetching()).toBe(0))
+  expect(screen.queryClient.getQueryData<LibraryEntry[]>(['library'])).toMatchObject([{ favorite: true, completed: false }])
+})
