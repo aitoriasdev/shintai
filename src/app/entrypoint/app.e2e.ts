@@ -1,7 +1,10 @@
 import { expect, test } from '@playwright/test'
+import { resetLibrary, stubCatalog } from '@/shared/lib/testing/e2e-catalog'
 import { expectAccessible } from '@/shared/lib/testing/expect-accessible'
 
 test.beforeEach(async ({ page }) => {
+  await resetLibrary(page)
+  await stubCatalog(page)
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
 })
