@@ -2,7 +2,10 @@ import { defineConfig, devices } from '@playwright/test'
 
 const PORT = 4173
 
-/** End-to-end flows of the built app. Specs sit next to the slice they cover: `src/**\/*.e2e.ts`. */
+/**
+ * End-to-end flows of the whole app (built frontend + real API + in-memory SQLite).
+ * Specs sit next to the slice they cover: `src/**\/*.e2e.ts`.
+ */
 export default defineConfig({
   testDir: './src',
   testMatch: '**/*.e2e.ts',
@@ -14,8 +17,9 @@ export default defineConfig({
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
-    command: `yarn build && yarn preview --host 127.0.0.1 --port ${PORT} --strictPort`,
-    url: `http://127.0.0.1:${PORT}`,
+    command: 'yarn build && yarn serve',
+    url: `http://127.0.0.1:${PORT}/api/health`,
+    env: { SHINTAI_PORT: String(PORT), SHINTAI_DB_PATH: ':memory:' },
     reuseExistingServer: false,
     timeout: 120_000,
   },
