@@ -37,7 +37,8 @@ describe('/api/library', () => {
     const { app, json } = setup()
     expect((await json('PUT', '/api/library/Q1', { game, patch: { score: 42 } })).status).toBe(400)
     expect((await json('PUT', '/api/library/Q2', { game })).status).toBe(400)
-    expect((await app.request('/api/library/Q1', { method: 'PUT', body: '{nope' })).status).toBe(400)
+    const malformed = await app.request('/api/library/Q1', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: '{nope' })
+    expect(malformed.status).toBe(400)
   })
 
   it('exports and imports backups', async () => {
@@ -50,6 +51,33 @@ describe('/api/library', () => {
     const imported = await target.json('POST', '/api/library/backup', await exported.json())
     expect(await imported.json()).toEqual({ added: 1, updated: 0, skipped: 0 })
     expect((await target.json('POST', '/api/library/backup', { app: 'other' })).status).toBe(400)
+  })
+
+  it('rejects cross-site backup imports (CSRF), leaving the library untouched', async () => {
+    const { app, json } = setup()
+    await json('PUT', '/api/library/Q1', { game, patch: { score: 9 } })
+    const forged = JSON.stringify({
+      app: 'shintai',
+      version: 1,
+      exportedAt: 0,
+      entries: [{ game, score: 1, completed: false, favorite: false, addedAt: 0, updatedAt: 9e15 }],
+    })
+
+    // fetch(url, { method: 'POST', mode: 'no-cors', body }) from another site: text/plain, no preflight.
+    const noCors = await app.request('/api/library/backup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=UTF-8', 'Content-Length': String(forged.length) },
+      body: forged,
+    })
+    expect(noCors.status).toBe(415)
+    const crossOrigin = await app.request('/api/library/backup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: 'https://evil.example' },
+      body: forged,
+    })
+    expect(crossOrigin.status).toBe(403)
+
+    expect(await (await json('GET', '/api/library')).json()).toMatchObject([{ score: 9 }])
   })
 
   it('test reset route empties the library', async () => {
