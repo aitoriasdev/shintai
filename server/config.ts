@@ -10,6 +10,8 @@ export interface AppConfig {
   staticRoot: string
   /** How long cached game details stay fresh. */
   detailsTtlMs: number
+  /** Exposes `/api/__test__/*` helpers. Only enabled by the E2E suite. */
+  enableTestRoutes: boolean
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -21,5 +23,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     databasePath: env.SHINTAI_DB_PATH ?? resolve('data', 'shintai.db'),
     staticRoot: resolve('dist'),
     detailsTtlMs: 30 * DAY_MS,
+    enableTestRoutes: env.SHINTAI_TEST_ROUTES === '1',
   }
 }

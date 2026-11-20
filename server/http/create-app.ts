@@ -8,6 +8,8 @@ import type { AppConfig } from '../config'
 import { GameNotFoundError } from '../games/game-catalog-service'
 import { gamesRoutes } from '../games/games-routes'
 import { UpstreamError } from '../games/wikipedia-client'
+import { libraryRoutes } from '../library/library-routes'
+import { LibraryRepository } from '../library/library-repository'
 import { TOKENS } from '../tokens'
 import { localOnly } from './local-only'
 
@@ -18,6 +20,14 @@ export function createApp(container: DependencyContainer) {
   app.use('/api/*', localOnly())
   app.get('/api/health', (c) => c.json({ status: 'ok' }))
   app.route('/api/games', gamesRoutes(container))
+  app.route('/api/library', libraryRoutes(container))
+
+  if (config.enableTestRoutes) {
+    app.post('/api/__test__/reset', (c) => {
+      container.resolve(LibraryRepository).deleteAll()
+      return c.body(null, 204)
+    })
+  }
 
   app.all('/api/*', (c) => c.json({ error: 'Not found' }, 404))
 

@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { createTestContainer } from '../testing/create-test-container'
 import { createApp } from './create-app'
 
-function setup() {
-  return createApp(createTestContainer().container)
+function setup(enableTestRoutes = false) {
+  const { container } = createTestContainer({ config: { enableTestRoutes } })
+  return createApp(container)
 }
 
 describe('createApp', () => {
@@ -17,5 +18,10 @@ describe('createApp', () => {
     const res = await setup().request('/api/nope')
     expect(res.status).toBe(404)
     expect(await res.json()).toEqual({ error: 'Not found' })
+  })
+
+  it('only exposes the test reset route when enabled', async () => {
+    expect((await setup().request('/api/__test__/reset', { method: 'POST' })).status).toBe(404)
+    expect((await setup(true).request('/api/__test__/reset', { method: 'POST' })).status).toBe(204)
   })
 })

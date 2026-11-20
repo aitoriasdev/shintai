@@ -9,6 +9,7 @@ const PORT = 4173
 export default defineConfig({
   testDir: './src',
   testMatch: '**/*.e2e.ts',
+  // All tests share one API process and database, which is reset before each test.
   workers: 1,
   reporter: 'list',
   use: {
@@ -19,7 +20,7 @@ export default defineConfig({
   webServer: {
     command: 'yarn build && yarn serve',
     url: `http://127.0.0.1:${PORT}/api/health`,
-    env: { SHINTAI_PORT: String(PORT), SHINTAI_DB_PATH: ':memory:' },
+    env: { SHINTAI_PORT: String(PORT), SHINTAI_DB_PATH: ':memory:', SHINTAI_TEST_ROUTES: '1' },
     reuseExistingServer: false,
     timeout: 120_000,
   },

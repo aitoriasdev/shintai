@@ -35,6 +35,7 @@ export function createTestContainer(overrides: { fetch?: FetchFn; config?: Parti
       databasePath: ':memory:',
       staticRoot: '/nonexistent',
       detailsTtlMs: 30 * 24 * 60 * 60 * 1000,
+      enableTestRoutes: false,
       ...overrides.config,
     },
     { clock, fetch },
