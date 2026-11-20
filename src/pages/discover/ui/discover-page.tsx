@@ -7,8 +7,8 @@ import { YearSelect } from '@/features/search-games/ui/year-select'
 import { announce } from '@/shared/lib/announce'
 import { useDocumentTitle } from '@/shared/lib/use-document-title'
 import { EmptyState } from '@/shared/ui/empty-state'
-import { GameGrid } from './game-grid'
-import { GameGridSkeleton } from './game-grid-skeleton'
+import { GameGrid } from '@/widgets/game-grid/ui/game-grid'
+import { GameGridSkeleton } from '@/widgets/game-grid/ui/game-grid-skeleton'
 
 interface DiscoverPageProps {
   /** Debounced search text from the header. */
