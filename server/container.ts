@@ -4,6 +4,8 @@ import { openDatabase } from './database/database'
 import { GameCatalogService } from './games/game-catalog-service'
 import { GameDetailsCache } from './games/game-details-cache'
 import { WikipediaClient } from './games/wikipedia-client'
+import { LibraryRepository } from './library/library-repository'
+import { LibraryService } from './library/library-service'
 import { TOKENS, type Clock, type FetchFn } from './tokens'
 
 const systemClock: Clock = { now: () => Date.now() }
@@ -23,5 +25,7 @@ export function createContainer(config: AppConfig, overrides: { clock?: Clock; f
   container.registerSingleton(WikipediaClient)
   container.registerSingleton(GameDetailsCache)
   container.registerSingleton(GameCatalogService)
+  container.registerSingleton(LibraryRepository)
+  container.registerSingleton(LibraryService)
   return container
 }

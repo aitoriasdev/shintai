@@ -11,4 +11,23 @@ export const MIGRATIONS: readonly string[] = [
     fetched_at INTEGER NOT NULL
   ) STRICT;
   `,
+  // 2 · The personal library: a snapshot of each game plus score, completed and favorite.
+  `
+  CREATE TABLE library_entries (
+    game_id     TEXT PRIMARY KEY,
+    page_id     INTEGER NOT NULL,
+    title       TEXT NOT NULL,
+    wiki_title  TEXT NOT NULL,
+    description TEXT,
+    cover_url   TEXT,
+    year        INTEGER,
+    score       INTEGER CHECK (score IS NULL OR score BETWEEN 1 AND 10),
+    completed   INTEGER NOT NULL DEFAULT 0 CHECK (completed IN (0, 1)),
+    favorite    INTEGER NOT NULL DEFAULT 0 CHECK (favorite IN (0, 1)),
+    added_at    INTEGER NOT NULL,
+    updated_at  INTEGER NOT NULL
+  ) STRICT;
+
+  CREATE INDEX library_entries_added_at ON library_entries (added_at DESC);
+  `,
 ]
