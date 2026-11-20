@@ -1,11 +1,14 @@
-import { expect, it } from 'vitest'
+import { expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-react'
 import { AppHeader } from './app-header'
 
-it('is the banner landmark with a home link and the search control', async () => {
-  const screen = await render(<AppHeader search={<input aria-label="Search all games" />} />)
+it('highlights the current view, shows the library count and switches views', async () => {
+  const onViewChange = vi.fn()
+  const screen = await render(<AppHeader view="discover" onViewChange={onViewChange} libraryCount={3} search={<input aria-label="search" />} />)
 
-  await expect.element(screen.getByRole('banner')).toBeVisible()
-  await expect.element(screen.getByRole('link', { name: 'Shintai' })).toHaveAttribute('href', '/')
-  await expect.element(screen.getByRole('textbox', { name: 'Search all games' })).toBeVisible()
+  await expect.element(screen.getByRole('link', { name: 'Discover' })).toHaveAttribute('aria-current', 'page')
+  await expect.element(screen.getByRole('link', { name: 'My library (3 games)' })).not.toHaveAttribute('aria-current')
+
+  await screen.getByRole('link', { name: 'My library (3 games)' }).click()
+  expect(onViewChange).toHaveBeenCalledWith('library')
 })

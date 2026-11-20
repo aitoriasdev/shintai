@@ -32,10 +32,11 @@ test('tracks games straight from the grid', async ({ page }) => {
 
   await expect(page.getByRole('button', { name: 'Favorite: Celeste' })).toHaveAttribute('aria-pressed', 'true')
   await expect(gameCard(page, 'Hades').getByText('Completed', { exact: true })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'My library (2 games)' })).toBeVisible()
 })
 
 test('meets WCAG 2.1 AA', async ({ page }) => {
   await page.getByRole('button', { name: 'Favorite: Celeste' }).click()
-  await expect(page.getByRole('button', { name: 'Favorite: Celeste' })).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.getByRole('link', { name: 'My library (1 game)' })).toBeVisible()
   await expectAccessible(page)
 })
