@@ -5,6 +5,8 @@ import react from '@vitejs/plugin-react'
 import { playwright } from '@vitest/browser-playwright'
 import { defineConfig } from 'vite'
 
+const API_PORT = Number(process.env.SHINTAI_PORT ?? 4321)
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
@@ -12,6 +14,9 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
+  },
+  server: {
+    proxy: { '/api': `http://127.0.0.1:${API_PORT}` },
   },
   test: {
     // Specs live next to the code they cover.
@@ -29,6 +34,15 @@ export default defineConfig({
             provider: playwright(),
             instances: [{ browser: 'chromium' }],
           },
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'server',
+          include: ['server/**/*.spec.ts'],
+          environment: 'node',
+          setupFiles: ['./server/testing/setup.ts'],
         },
       },
     ],

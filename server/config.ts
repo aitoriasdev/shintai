@@ -1,0 +1,20 @@
+import { resolve } from 'node:path'
+
+export interface AppConfig {
+  /** Interface the HTTP server binds to. Loopback only: the app is never exposed to the network. */
+  host: string
+  port: number
+  /** SQLite file path, or `:memory:`. */
+  databasePath: string
+  /** Built frontend served by the API in production (`yarn start`). */
+  staticRoot: string
+}
+
+export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
+  return {
+    host: '127.0.0.1',
+    port: Number(env.SHINTAI_PORT ?? 4321),
+    databasePath: env.SHINTAI_DB_PATH ?? resolve('data', 'shintai.db'),
+    staticRoot: resolve('dist'),
+  }
+}
