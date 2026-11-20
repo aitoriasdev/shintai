@@ -6,11 +6,13 @@ import { HTTPException } from 'hono/http-exception'
 import type { DependencyContainer } from 'tsyringe'
 import type { AppConfig } from '../config'
 import { TOKENS } from '../tokens'
+import { localOnly } from './local-only'
 
 export function createApp(container: DependencyContainer) {
   const config = container.resolve<AppConfig>(TOKENS.Config)
   const app = new Hono()
 
+  app.use('/api/*', localOnly())
   app.get('/api/health', (c) => c.json({ status: 'ok' }))
 
   app.all('/api/*', (c) => c.json({ error: 'Not found' }, 404))
