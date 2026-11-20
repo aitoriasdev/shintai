@@ -5,6 +5,11 @@ import { createPortal } from 'react-dom'
 /** Element that holds the rest of the app; made `inert` while a dialog is open. */
 const APP_ROOT_ID = 'root'
 
+/** Where focus goes on close when the opener no longer exists (e.g. its card was removed). */
+function focusFallback(): HTMLElement | null {
+  return document.querySelector<HTMLElement>('main[tabindex], main h1[tabindex]') ?? document.querySelector<HTMLElement>('main')
+}
+
 interface DialogProps {
   open: boolean
   onClose: () => void
@@ -15,7 +20,11 @@ interface DialogProps {
 
 /**
  * Accessible modal dialog: the rest of the page becomes `inert` (focus and screen readers stay
- * inside), Escape and the backdrop close it, page scroll is locked and focus is restored on close.
+ * inside), Escape and the backdrop close it, page scroll is locked and focus is restored on close
+ * (to the opener, or to the main content when the opener has been removed meanwhile).
+ *
+ * Global live regions (`LiveAnnouncer`, `ErrorToast`) portal to `<body>`, outside the inert root,
+ * so they keep working while a dialog is open.
  */
 export function Dialog({ open, onClose, labelledBy, children }: DialogProps) {
   const panelRef = useRef<HTMLDivElement>(null)
@@ -38,7 +47,8 @@ export function Dialog({ open, onClose, labelledBy, children }: DialogProps) {
       window.removeEventListener('keydown', onKeyDown)
       appRoot?.removeAttribute('inert')
       document.body.style.overflow = overflow
-      previouslyFocused?.focus()
+      const target = previouslyFocused?.isConnected ? previouslyFocused : focusFallback()
+      target?.focus()
     }
   }, [open, onClose])
 

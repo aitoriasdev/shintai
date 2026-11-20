@@ -11,3 +11,13 @@ it('exposes announcements through a polite status region', async () => {
   announce('24 games found')
   await expect.element(region).toHaveTextContent('24 games found')
 })
+
+it('lives outside an inert app root', async () => {
+  const appRoot = document.createElement('div')
+  appRoot.setAttribute('inert', '')
+  document.body.append(appRoot)
+
+  const screen = await render(<LiveAnnouncer />, { container: appRoot })
+  expect(screen.getByRole('status').element().closest('[inert]')).toBeNull()
+  appRoot.remove()
+})
