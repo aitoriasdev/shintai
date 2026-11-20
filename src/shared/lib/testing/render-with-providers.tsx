@@ -7,16 +7,21 @@ export function createTestQueryClient() {
   return new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: Infinity }, mutations: { retry: false } } })
 }
 
-/** Renders `ui` with the same providers as the app (React Query + Motion), animations disabled. */
+/**
+ * Renders `ui` with the same providers as the app (React Query + Motion), animations disabled.
+ * The returned `rerender` keeps the same providers and query client.
+ */
 export async function renderWithProviders(ui: ReactNode, queryClient = createTestQueryClient()) {
-  const screen = await render(
+  const withProviders = (node: ReactNode) => (
     <QueryClientProvider client={queryClient}>
       <LazyMotion features={domAnimation} strict>
-        <MotionConfig reducedMotion="always">{ui}</MotionConfig>
+        <MotionConfig reducedMotion="always">{node}</MotionConfig>
       </LazyMotion>
-    </QueryClientProvider>,
+    </QueryClientProvider>
   )
-  return Object.assign(screen, { queryClient })
+  const screen = await render(withProviders(ui))
+  const rerender = screen.rerender
+  return Object.assign(screen, { queryClient, rerender: (next: ReactNode) => rerender(withProviders(next)) })
 }
 
 type Handler = (request: { url: URL; method: string; body: unknown }) => Response | Promise<Response>

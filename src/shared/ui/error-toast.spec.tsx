@@ -11,3 +11,20 @@ it('shows errors in an alert region until dismissed', async () => {
   await screen.getByRole('button', { name: 'Dismiss' }).click()
   await expect.element(screen.getByText('Could not save your change.')).not.toBeInTheDocument()
 })
+
+it('stays announced and dismissible while a dialog makes the app root inert', async () => {
+  const appRoot = document.createElement('div')
+  appRoot.id = 'root'
+  appRoot.setAttribute('inert', '')
+  document.body.append(appRoot)
+
+  const screen = await render(<ErrorToast />, { container: appRoot })
+  showError('Could not save your change.')
+
+  const alert = screen.getByRole('alert')
+  await expect.element(alert).toHaveTextContent('Could not save your change.')
+  expect(alert.element().closest('[inert]')).toBeNull()
+  await screen.getByRole('button', { name: 'Dismiss' }).click()
+  await expect.element(screen.getByText('Could not save your change.')).not.toBeInTheDocument()
+  appRoot.remove()
+})

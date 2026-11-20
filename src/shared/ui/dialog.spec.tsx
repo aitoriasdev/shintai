@@ -38,6 +38,23 @@ it('is a named modal that takes focus and makes the page behind it inert', async
   expect(appRoot.hasAttribute('inert')).toBe(true)
 })
 
+it('falls back to the main content when the opener is gone (2.4.3)', async () => {
+  const main = document.createElement('main')
+  main.tabIndex = -1
+  appRoot.append(main)
+  const opener = appRoot.querySelector('button')!
+  opener.focus()
+
+  const screen = await renderDialog(true)
+  opener.remove()
+  await screen.rerender(
+    <Dialog open={false} onClose={vi.fn()} labelledBy="dialog-title">
+      {null}
+    </Dialog>,
+  )
+  expect(document.activeElement).toBe(main)
+})
+
 it('closes on Escape and restores the page', async () => {
   const onClose = vi.fn()
   const screen = await renderDialog(true, onClose)
