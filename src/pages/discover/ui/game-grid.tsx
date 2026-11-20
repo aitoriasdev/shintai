@@ -1,10 +1,31 @@
 import type { GameSummary } from '@contracts/game'
 import { useEffect } from 'react'
 import { GameCard } from '@/entities/game/ui/game-card'
+import { useLibraryEntry } from '@/entities/library/api/library-queries'
+import { EntryBadges } from '@/entities/library/ui/entry-badges'
+import { CompletedButton } from '@/features/toggle-completed/ui/completed-button'
+import { FavoriteButton } from '@/features/toggle-favorite/ui/favorite-button'
 import { useInView } from '@/shared/lib/use-in-view'
 import { Spinner } from '@/shared/ui/spinner'
 
 export const GRID_CLASS = 'grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+
+function GameGridItem({ game, onOpen }: { game: GameSummary; onOpen: (game: GameSummary) => void }) {
+  const entry = useLibraryEntry(game.id)
+  return (
+    <GameCard
+      game={game}
+      onOpen={onOpen}
+      badges={<EntryBadges entry={entry} />}
+      actions={
+        <>
+          <FavoriteButton game={game} />
+          <CompletedButton game={game} />
+        </>
+      }
+    />
+  )
+}
 
 interface GameGridProps {
   games: GameSummary[]
@@ -28,7 +49,7 @@ export function GameGrid({ games, onOpen, label, hasMore = false, isLoadingMore 
       <ul className={GRID_CLASS}>
         {games.map((game) => (
           <li key={game.id}>
-            <GameCard game={game} onOpen={onOpen} />
+            <GameGridItem game={game} onOpen={onOpen} />
           </li>
         ))}
       </ul>

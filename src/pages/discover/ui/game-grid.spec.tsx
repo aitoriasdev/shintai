@@ -1,22 +1,29 @@
-import { expect, it, vi } from 'vitest'
-import { renderWithProviders } from '@/shared/lib/testing/render-with-providers'
-import { makeGame } from '@/shared/lib/testing/fixtures'
+import { afterEach, expect, it, vi } from 'vitest'
+import { fakeApi, renderWithProviders } from '@/shared/lib/testing/render-with-providers'
+import { makeEntry, makeGame } from '@/shared/lib/testing/fixtures'
 import { GameGrid } from './game-grid'
+
+afterEach(() => vi.restoreAllMocks())
 
 const celeste = makeGame()
 const hades = makeGame({ id: 'Q2', pageId: 2, title: 'Hades', description: '2020 video game' })
 
-it('renders a card per game that opens its details', async () => {
+it('renders a card per game with library status and quick actions', async () => {
+  vi.spyOn(window, 'fetch').mockImplementation(fakeApi(() => Response.json([makeEntry({ score: 9, favorite: true })])))
   const onOpen = vi.fn()
   const screen = await renderWithProviders(<GameGrid label="Results" games={[celeste, hades]} onOpen={onOpen} />)
 
   await expect.element(screen.getByRole('listitem')).toHaveLength(2)
+  await expect.element(screen.getByText('Your score: 9 out of 10')).toBeInTheDocument()
+  await expect.element(screen.getByRole('button', { name: 'Favorite: Celeste' })).toHaveAttribute('aria-pressed', 'true')
+  await expect.element(screen.getByRole('button', { name: 'Favorite: Hades' })).toHaveAttribute('aria-pressed', 'false')
 
   await screen.getByRole('button', { name: 'Hades', exact: true }).click()
   expect(onOpen).toHaveBeenCalledWith(hades)
 })
 
 it('offers an explicit "Load more" control besides infinite scroll', async () => {
+  vi.spyOn(window, 'fetch').mockImplementation(fakeApi(() => Response.json([])))
   const onLoadMore = vi.fn()
   const screen = await renderWithProviders(
     <div style={{ marginTop: '300vh' }}>
@@ -28,6 +35,7 @@ it('offers an explicit "Load more" control besides infinite scroll', async () =>
 })
 
 it('asks for more games when the end of the grid is visible', async () => {
+  vi.spyOn(window, 'fetch').mockImplementation(fakeApi(() => Response.json([])))
   const onLoadMore = vi.fn()
   await renderWithProviders(<GameGrid label="Results" games={[celeste]} onOpen={vi.fn()} hasMore onLoadMore={onLoadMore} />)
   await vi.waitFor(() => expect(onLoadMore).toHaveBeenCalled())
