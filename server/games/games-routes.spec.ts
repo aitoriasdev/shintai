@@ -14,17 +14,23 @@ describe('/api/games', () => {
     )
     const res = await setup(fetchFn as typeof fetch).request('/api/games/search?q=celeste&year=2018')
     expect(res.status).toBe(200)
+    expect(res.headers.get('Cache-Control')).toBe('private, max-age=3600')
     expect(((await res.json()) as GameSearchPage).games[0].title).toBe('Celeste')
     expect(new URL(String(fetchFn.mock.calls[0][0])).searchParams.get('gsrsearch')).toContain('incategory:"2018 video games"')
   })
 
   it('validates search params', async () => {
-    expect((await setup().request('/api/games/search?year=abc')).status).toBe(400)
+    const res = await setup().request('/api/games/search?year=abc')
+    expect(res.status).toBe(400)
+    expect(res.headers.get('Cache-Control')).toBeNull()
   })
 
   it('maps upstream failures to 502', async () => {
     const failing = setup((async () => new Response('', { status: 503 })) as typeof fetch)
-    expect((await failing.request('/api/games/search?q=x')).status).toBe(502)
+    const failed = await failing.request('/api/games/search?q=x')
+    expect(failed.status).toBe(502)
+    // An error must not be cached, or "Try again" would keep failing after Wikipedia recovers.
+    expect(failed.headers.get('Cache-Control')).toBeNull()
 
     const offline = setup((async () => Promise.reject(new TypeError('fetch failed'))) as typeof fetch)
     const res = await offline.request('/api/games/search?q=x')

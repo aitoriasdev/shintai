@@ -27,7 +27,10 @@ export class GameCatalogService {
     return this.wikipedia.searchGames({ text: query.q, year: query.year, offset: query.offset })
   }
 
-  /** Wikipedia intro + large cover, enriched with Wikidata facts when a Q-id is known. Cached in SQLite. */
+  /**
+   * Wikipedia intro + large cover, enriched with Wikidata facts when a Q-id is known.
+   * Only complete results (article + Wikidata facts) are cached in SQLite.
+   */
   async getDetails(pageId: number, qid?: string): Promise<GameDetails> {
     const cached = this.cache.get(pageId, this.config.detailsTtlMs)
     if (cached) return cached
@@ -35,7 +38,7 @@ export class GameCatalogService {
     const [article, facts] = await Promise.all([
       this.wikipedia.getArticle(pageId),
       // Facts are a best-effort enrichment: never fail the request because of Wikidata.
-      qid && isQid(qid) ? this.wikipedia.getFacts(qid).catch(() => null) : Promise.resolve(EMPTY_FACTS),
+      qid && isQid(qid) ? this.wikipedia.getFacts(qid).catch(() => null) : Promise.resolve(null),
     ])
     if (!article) throw new GameNotFoundError(pageId)
 
@@ -45,7 +48,8 @@ export class GameCatalogService {
       wikipediaUrl: article.url ?? `https://en.wikipedia.org/?curid=${pageId}`,
       ...(facts ?? EMPTY_FACTS),
     }
-    // Do not cache partial results, so a transient Wikidata failure heals on the next visit.
+    // Without facts (no Q-id given, or Wikidata failed) the result is partial: don't cache it, so a
+    // later request with a Q-id, or after Wikidata recovers, gets the full details.
     if (facts) this.cache.set(pageId, details)
     return details
   }

@@ -10,8 +10,9 @@ export function gamesRoutes(container: DependencyContainer) {
 
   return new Hono()
     .get('/search', async (c) => {
-      c.header('Cache-Control', 'private, max-age=3600')
-      return c.json(await catalog().search(parseQuery(c, gameSearchQuerySchema)))
+      const page = await catalog().search(parseQuery(c, gameSearchQuerySchema))
+      // Only successful results may be cached: an error response must never stick in the browser cache.
+      return c.json(page, 200, { 'Cache-Control': 'private, max-age=3600' })
     })
     .get('/:pageId/details', async (c) => {
       const pageId = Number(c.req.param('pageId'))

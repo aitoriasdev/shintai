@@ -50,6 +50,13 @@ describe('GameCatalogService.getDetails', () => {
     expect(fetchFn).toHaveBeenCalledTimes(6) // article + Wikidata (retried once), twice: partial results are not cached
   })
 
+  it('does not let a request without a Q-id hide the facts from later requests', async () => {
+    const { service, fetchFn } = setup((url) => Response.json(url.hostname.includes('wikidata') ? facts : article))
+    expect((await service.getDetails(10)).platforms).toEqual([])
+    expect((await service.getDetails(10, 'Q1')).platforms).toEqual(['PC'])
+    expect(fetchFn).toHaveBeenCalledTimes(3)
+  })
+
   it('skips Wikidata without a valid Q-id', async () => {
     const { service, fetchFn } = setup(() => Response.json(article))
     await service.getDetails(10, 'not-a-qid')
