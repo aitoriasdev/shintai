@@ -26,6 +26,16 @@ test('browses, searches and filters the catalog', async ({ page }) => {
   await expect(page.getByRole('listitem')).toHaveCount(1)
 })
 
+test('tracks games straight from the grid', async ({ page }) => {
+  await page.getByRole('button', { name: 'Favorite: Celeste' }).click()
+  await page.getByRole('button', { name: 'Completed: Hades' }).click()
+
+  await expect(page.getByRole('button', { name: 'Favorite: Celeste' })).toHaveAttribute('aria-pressed', 'true')
+  await expect(gameCard(page, 'Hades').getByText('Completed', { exact: true })).toBeVisible()
+})
+
 test('meets WCAG 2.1 AA', async ({ page }) => {
+  await page.getByRole('button', { name: 'Favorite: Celeste' }).click()
+  await expect(page.getByRole('button', { name: 'Favorite: Celeste' })).toHaveAttribute('aria-pressed', 'true')
   await expectAccessible(page)
 })

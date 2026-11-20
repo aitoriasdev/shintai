@@ -4,8 +4,12 @@ import { ExternalLink, X } from 'lucide-react'
 import { useId, useState } from 'react'
 import { gameQueries } from '@/entities/game/api/game-queries'
 import { GameCover } from '@/entities/game/ui/game-cover'
+import { CompletedButton } from '@/features/toggle-completed/ui/completed-button'
+import { FavoriteButton } from '@/features/toggle-favorite/ui/favorite-button'
 import { cn } from '@/shared/lib/cn'
 import { Dialog } from '@/shared/ui/dialog'
+import { LibraryButton } from './library-button'
+import { ScorePicker } from './score-picker'
 
 const TITLE_ID = 'game-details-title'
 
@@ -62,6 +66,14 @@ function Body({ game }: { game: GameSummary }) {
           </h2>
           {game.description && <p className="text-sm text-muted">{game.description}</p>}
         </div>
+
+        <div className="flex flex-wrap gap-2">
+          <LibraryButton game={game} />
+          <FavoriteButton game={game} size="md" showLabel />
+          <CompletedButton game={game} size="md" showLabel />
+        </div>
+
+        <ScorePicker game={game} />
 
         {details.isPending && (
           <div role="status" className="space-y-2">

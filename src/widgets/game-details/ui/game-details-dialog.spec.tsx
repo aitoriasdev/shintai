@@ -17,7 +17,7 @@ const details: GameDetails = {
   publishers: [],
 }
 
-it('shows game details and facts', async () => {
+it('shows game details, personal controls and facts', async () => {
   vi.spyOn(window, 'fetch').mockImplementation(
     fakeApi(({ url }) => Response.json(url.pathname.startsWith('/api/games/') ? details : [])),
   )
@@ -32,6 +32,9 @@ it('shows game details and facts', async () => {
   await expect
     .element(screen.getByRole('link', { name: 'Read more on Wikipedia (opens in a new tab)' }))
     .toHaveAttribute('href', details.wikipediaUrl)
+  await expect.element(screen.getByRole('button', { name: 'Add to library' })).toBeVisible()
+  await expect.element(screen.getByRole('button', { name: 'Favorite: Celeste' })).toBeVisible()
+  await expect.element(screen.getByRole('group', { name: 'Your score' })).toBeVisible()
 
   const showMore = screen.getByRole('button', { name: 'Show more' })
   await expect.element(showMore).toHaveAttribute('aria-expanded', 'false')
