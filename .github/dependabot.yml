@@ -1,0 +1,81 @@
+version: 2
+updates:
+  # One package.json and yarn.lock at the root. Dependabot's "npm" ecosystem
+  # also updates Yarn 4 lockfiles.
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 10
+    # Yarn refuses versions younger than 24 hours (npmMinimalAgeGate), so
+    # don't propose them either.
+    cooldown:
+      default-days: 3
+    labels:
+      - 'dependencies'
+    commit-message:
+      prefix: 'build'
+      include: 'scope'
+    # A dependency joins the first group it matches. Groups mirror the
+    # packages that must move together.
+    groups:
+      react:
+        patterns:
+          - 'react'
+          - 'react-dom'
+          - '@types/react'
+          - '@types/react-dom'
+      tanstack:
+        patterns:
+          - '@tanstack/*'
+      build-and-test:
+        patterns:
+          - 'vite'
+          - '@vitejs/*'
+          - 'vitest'
+          - '@vitest/*'
+          - 'vitest-browser-react'
+          - 'playwright'
+          - '@playwright/*'
+          - '@axe-core/*'
+          - 'tailwindcss'
+          - '@tailwindcss/*'
+      lint:
+        patterns:
+          - 'oxlint'
+          - 'steiger'
+          - '@feature-sliced/*'
+      server:
+        patterns:
+          - 'hono'
+          - '@hono/*'
+          - 'tsyringe'
+          - 'reflect-metadata'
+          - 'zod'
+          - 'tsx'
+      minor-and-patch:
+        update-types:
+          - 'minor'
+          - 'patch'
+    ignore:
+      # Major Node type updates follow the runtime: bump them together with
+      # `engines.node` in package.json, by hand.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    cooldown:
+      default-days: 3
+    labels:
+      - 'dependencies'
+      - 'github_actions'
+    commit-message:
+      prefix: 'ci'
+      include: 'scope'
+    groups:
+      github-actions:
+        patterns:
+          - '*'
