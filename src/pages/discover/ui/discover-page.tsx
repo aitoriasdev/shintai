@@ -52,7 +52,7 @@ export function DiscoverPage({ query, onOpen }: DiscoverPageProps) {
 
       {search.isPending ? (
         <GameGridSkeleton label="Loading games" />
-      ) : search.isError ? (
+      ) : search.isError && !search.data ? (
         <EmptyState icon={<WifiOff className="size-6" />} title="Could not load games">
           <p role="alert">{search.error.message}</p>
           <button type="button" className="mt-3 min-h-11 font-medium text-accent hover:underline" onClick={() => search.refetch()}>
@@ -64,14 +64,30 @@ export function DiscoverPage({ query, onOpen }: DiscoverPageProps) {
           Try a different spelling{year ? ' or another year' : ''}.
         </EmptyState>
       ) : (
-        <GameGrid
-          label="Games"
-          games={games}
-          onOpen={onOpen}
-          hasMore={search.hasNextPage}
-          isLoadingMore={search.isFetchingNextPage}
-          onLoadMore={search.fetchNextPage}
-        />
+        <>
+          <GameGrid
+            label="Games"
+            games={games}
+            onOpen={onOpen}
+            // After a failed page, stop auto-loading (it would retry in a loop) and offer an explicit retry.
+            hasMore={search.hasNextPage && !search.isFetchNextPageError}
+            isLoadingMore={search.isFetchingNextPage}
+            onLoadMore={search.fetchNextPage}
+          />
+          {search.isFetchNextPageError && (
+            <div role="alert" className="flex flex-wrap items-center justify-center gap-3 pt-8 text-sm text-text">
+              <p>Could not load more games: {search.error?.message}</p>
+              <button
+                type="button"
+                disabled={search.isFetchingNextPage}
+                onClick={() => search.fetchNextPage()}
+                className="h-11 rounded-full border border-control bg-surface px-5 font-medium hover:bg-surface-2 disabled:opacity-50"
+              >
+                {search.isFetchingNextPage ? 'Retrying…' : 'Try again'}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   )

@@ -15,6 +15,12 @@ interface GameCoverProps {
 /** Box art with a lazy, fade-in image and a generated fallback when there is no cover. */
 export function GameCover({ title, src, className, eager = false, decorative = false }: GameCoverProps) {
   const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading')
+  // A new source (e.g. the dialog swapping the thumbnail for a larger image) deserves a fresh attempt.
+  const [currentSrc, setCurrentSrc] = useState(src)
+  if (src !== currentSrc) {
+    setCurrentSrc(src)
+    setStatus('loading')
+  }
   const showImage = src && status !== 'error'
 
   return (

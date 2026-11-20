@@ -42,3 +42,25 @@ it('shows the API error with a retry', async () => {
   await expect.element(screen.getByText('Wikipedia is unavailable right now')).toBeVisible()
   await expect.element(screen.getByRole('button', { name: 'Try again' })).toBeVisible()
 })
+
+it('keeps loaded games when the next page fails, and retries just that page', async () => {
+  let failNextPage = true
+  vi.spyOn(window, 'fetch').mockImplementation(
+    fakeApi(({ url }) => {
+      if (url.pathname === '/api/library') return Response.json([])
+      if (!url.searchParams.has('offset')) return Response.json({ games: [makeGame({ title: 'Celeste' })], nextOffset: 24 })
+      if (failNextPage) return Response.json({ error: 'Wikipedia is unavailable right now' }, { status: 502 })
+      return Response.json({ games: [makeGame({ id: 'Q2', pageId: 2, title: 'Hades' })], nextOffset: null })
+    }),
+  )
+
+  const screen = await renderWithProviders(<DiscoverPage query="" onOpen={vi.fn()} />)
+  const alert = screen.getByRole('alert')
+  await expect.element(alert.getByText('Could not load more games', { exact: false })).toBeVisible()
+  await expect.element(screen.getByRole('heading', { name: 'Celeste' })).toBeVisible()
+
+  failNextPage = false
+  await alert.getByRole('button', { name: 'Try again' }).click()
+  await expect.element(screen.getByRole('heading', { name: 'Hades' })).toBeVisible()
+  await expect.element(screen.getByRole('heading', { name: 'Celeste' })).toBeVisible()
+})

@@ -14,3 +14,11 @@ it('is hidden from assistive tech when decorative', async () => {
   const screen = await render(<GameCover title="Celeste" src={null} decorative />)
   await expect.element(screen.getByRole('img')).not.toBeInTheDocument()
 })
+
+it('retries when the source changes after a failed load', async () => {
+  const screen = await render(<GameCover title="Celeste" src="data:image/png;base64,broken" />)
+  await expect.element(screen.getByRole('img', { name: 'Celeste (no cover art available)' })).toBeVisible()
+
+  await screen.rerender(<GameCover title="Celeste" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" />)
+  await expect.element(screen.getByRole('img', { name: 'Celeste cover art' })).toBeInTheDocument()
+})
