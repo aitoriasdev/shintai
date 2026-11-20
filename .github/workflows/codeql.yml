@@ -53,8 +53,8 @@ jobs:
         # your codebase is analyzed, see https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/codeql-code-scanning-for-compiled-languages
         - language: actions
           build-mode: none
-        # javascript-typescript is added together with the first TypeScript code: CodeQL fails
-        # ("no source code seen") when a language has nothing to analyze.
+        - language: javascript-typescript
+          build-mode: none
     steps:
     - name: Checkout repository
       uses: actions/checkout@v7
