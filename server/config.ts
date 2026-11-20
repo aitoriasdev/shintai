@@ -8,7 +8,11 @@ export interface AppConfig {
   databasePath: string
   /** Built frontend served by the API in production (`yarn start`). */
   staticRoot: string
+  /** How long cached game details stay fresh. */
+  detailsTtlMs: number
 }
+
+const DAY_MS = 24 * 60 * 60 * 1000
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   return {
@@ -16,5 +20,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     port: Number(env.SHINTAI_PORT ?? 4321),
     databasePath: env.SHINTAI_DB_PATH ?? resolve('data', 'shintai.db'),
     staticRoot: resolve('dist'),
+    detailsTtlMs: 30 * DAY_MS,
   }
 }

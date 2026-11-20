@@ -12,6 +12,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
+      '@contracts': fileURLToPath(new URL('./contracts', import.meta.url)),
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
@@ -40,7 +41,7 @@ export default defineConfig({
         extends: true,
         test: {
           name: 'server',
-          include: ['server/**/*.spec.ts'],
+          include: ['server/**/*.spec.ts', 'contracts/**/*.spec.ts'],
           environment: 'node',
           setupFiles: ['./server/testing/setup.ts'],
         },
