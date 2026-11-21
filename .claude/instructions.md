@@ -104,6 +104,21 @@ Also add these when they apply, whatever the type:
 - If no label fits, create one rather than leaving the PR unlabelled: `gh label create <name> --color <hex> --description "<one sentence>"`, lowercase and in the style of the existing ones. Add it to the tables above in the same PR.
 - Dependabot labels its own PRs (`labels` in `.github/dependabot.yml`).
 
+## Claude Code skills and agents
+
+`CLAUDE.md` imports this file, so every Claude Code session loads these rules.
+
+| Skill (`.claude/skills/`) | Use it…                                                                       |
+| ------------------------- | ----------------------------------------------------------------------------- |
+| `fix`                     | for lint, type or FSD errors, and before committing                           |
+| `error-messages`          | when adding or changing an error the user can see                             |
+| `frontend-design`         | when building or reshaping UI (its "In Shintai" section comes first)          |
+| `review-pr`               | before opening or merging a PR; runs the agents below                         |
+
+The review agents in `.claude/agents/` (`code-reviewer`, `pr-test-analyzer`, `silent-failure-hunter`, `type-design-analyzer`, `comment-analyzer`, `code-simplifier`) come from Anthropic's pr-review-toolkit and are adapted to this project. For a bug-focused review, use the built-in `/code-review`.
+
+Third-party skills and agents are Apache-2.0 (Anthropic). Keep the comment at the top of each that says what was changed for Shintai. Name new skill folders in kebab-case; `SKILL.md` keeps the name Claude Code requires.
+
 ## Known pitfalls
 
 - Node 25+ no longer bundles Corepack's shims in every setup. If `yarn` is missing or the wrong version, run `corepack enable`.
