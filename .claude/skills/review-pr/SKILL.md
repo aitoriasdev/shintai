@@ -1,8 +1,11 @@
 ---
-description: "Comprehensive PR review using specialized agents"
+name: review-pr
+description: "Comprehensive PR review using the specialized review agents in .claude/agents (code, tests, comments, errors, types, simplify). Use before opening or merging a pull request."
 argument-hint: "[review-aspects]"
-allowed-tools: ["Bash", "Glob", "Grep", "Read", "Task"]
+allowed-tools: ["Bash", "Glob", "Grep", "Read", "Agent"]
 ---
+
+<!-- Adapted for Shintai from Anthropic's pr-review-toolkit plugin (Apache-2.0, https://www.apache.org/licenses/LICENSE-2.0): skill layout, Shintai scope and usage. -->
 
 # Comprehensive PR Review
 
@@ -28,8 +31,9 @@ Run a comprehensive pull request review using multiple specialized agents, each 
    - **all** - Run all applicable reviews (default)
 
 3. **Identify Changed Files**
-   - Run `git diff --name-only` to see modified files
+   - On a branch, compare with `main`: `git diff --name-only origin/main...HEAD`, plus `git diff --name-only` for uncommitted work
    - Check if PR already exists: `gh pr view`
+   - In a stacked series, review only this PR's own commits: diff against its base branch (`gh pr view --json baseRefName`), not `main`
    - Identify file types and what reviews apply
 
 4. **Determine Applicable Reviews**
@@ -91,24 +95,24 @@ Run a comprehensive pull request review using multiple specialized agents, each 
 
 **Full review (default):**
 ```
-/pr-review-toolkit:review-pr
+/review-pr
 ```
 
 **Specific aspects:**
 ```
-/pr-review-toolkit:review-pr tests errors
+/review-pr tests errors
 # Reviews only test coverage and error handling
 
-/pr-review-toolkit:review-pr comments
+/review-pr comments
 # Reviews only code comments
 
-/pr-review-toolkit:review-pr simplify
+/review-pr simplify
 # Simplifies code after passing review
 ```
 
 **Parallel review:**
 ```
-/pr-review-toolkit:review-pr all parallel
+/review-pr all parallel
 # Launches all agents in parallel
 ```
 
@@ -158,7 +162,7 @@ Run a comprehensive pull request review using multiple specialized agents, each 
 **Before committing:**
 ```
 1. Write code
-2. Run: /pr-review-toolkit:review-pr code errors
+2. Run: /review-pr code errors
 3. Fix any critical issues
 4. Commit
 ```
@@ -166,7 +170,7 @@ Run a comprehensive pull request review using multiple specialized agents, each 
 **Before creating PR:**
 ```
 1. Stage all changes
-2. Run: /pr-review-toolkit:review-pr all
+2. Run: /review-pr all
 3. Address all critical and important issues
 4. Run specific reviews again to verify
 5. Create PR
