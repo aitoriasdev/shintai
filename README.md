@@ -96,6 +96,7 @@ Server state is handled by TanStack Query with optimistic updates; animations us
 ## Conventions
 
 - **File names are always kebab-case** (enforced by `unicorn/filename-case`).
+- **Folder boundaries are linted**: the UI never imports the server (and only types from `contracts/`), the server never imports the UI, and `contracts/` imports neither.
 - **No barrel files.** Import from the file that defines a thing (`@/entities/game/ui/game-card`). Steiger's `public-api` rules are disabled accordingly; layer rules still apply.
 - **Types live with the code that owns them**: there is no global `types.ts`.
 - **Tests sit next to the code they cover**: `*.spec.ts(x)` for Vitest, `*.e2e.ts` for Playwright.

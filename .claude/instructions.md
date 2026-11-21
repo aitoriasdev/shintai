@@ -20,6 +20,10 @@ Never skip a failing check, never commit with `--no-verify`, and never relax a l
   - Keep code inside its only consumer until a second one needs it. Example: the game grid lived in `pages/discover` until the library page needed it, then moved to `widgets/`.
 - `server/`: the local API (Hono, tsyringe, `node:sqlite`). Every dependency is injected with `@inject(token)`. The composition root is `server/container.ts`, and schema changes are new entries in `server/database/migrations.ts` (never edit a shipped migration).
 - `contracts/`: Zod schemas and inferred types shared by the API and the UI, one file per domain. The UI imports types only, so Zod stays out of the bundle.
+- **Folder boundaries** (oxlint `no-restricted-imports`, overrides in `.oxlintrc.json`):
+  - `src/` never imports `server/`, `zod` or `node:*`, and imports `@contracts/*` with `import type` only. Playwright files (`*.e2e.ts`, `src/shared/lib/testing/`) are exempt, because they run in Node.
+  - `server/` never imports `src/`, and imports contracts through `@contracts/*`.
+  - `contracts/` imports neither `src/` nor `server/`, nor `node:*`; between contracts, it uses relative imports.
 
 ### File names and imports
 

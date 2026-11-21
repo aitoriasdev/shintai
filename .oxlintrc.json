@@ -7,5 +7,79 @@
     "unicorn/filename-case": ["error", { "case": "kebabCase" }],
     "import/no-cycle": "error"
   },
+  "overrides": [
+    {
+      "files": ["src/**"],
+      "excludeFiles": ["src/**/*.e2e.ts", "src/shared/lib/testing/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "zod",
+                "message": "The UI doesn't bundle zod. Import the inferred types from contracts/ instead."
+              }
+            ],
+            "patterns": [
+              {
+                "regex": "^(\\.\\./)+(server|contracts)(/|$)",
+                "message": "The UI never imports server/. Shared API shapes come from @contracts/*."
+              },
+              {
+                "regex": "^@contracts/",
+                "allowTypeImports": true,
+                "message": "The UI imports types only from contracts/ (`import type`), so zod stays out of the bundle."
+              },
+              {
+                "regex": "^node:",
+                "message": "src/ runs in the browser. Node.js code belongs in server/."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["server/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "^(@/|(\\.\\./)+src(/|$))",
+                "message": "The server never imports the UI. Shared API shapes go in contracts/."
+              },
+              {
+                "regex": "^(\\.\\./)+contracts(/|$)",
+                "message": "Import contracts through the @contracts/* alias."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["contracts/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "regex": "^(@/|@contracts/|(\\.\\./)+(src|server)(/|$))",
+                "message": "contracts/ is shared by the UI and the server, so it imports neither. Import other contracts relatively (./game)."
+              },
+              {
+                "regex": "^node:",
+                "message": "contracts/ also runs in the browser. Node.js code belongs in server/."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
   "ignorePatterns": ["dist", "node_modules", ".yarn"]
 }
