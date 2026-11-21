@@ -52,6 +52,8 @@ The server only binds to `127.0.0.1`, so it is never reachable from other machin
 | `yarn test:e2e`   | Playwright end-to-end flows plus axe WCAG 2.1 AA scans, against the built app and in-memory SQLite |
 | `yarn check`      | All of the above                                                       |
 
+GitHub Actions runs the same four checks on every pull request (`.github/workflows/ci.yml`), and `main` accepts a pull request only when all of them pass.
+
 ## Architecture
 
 ```

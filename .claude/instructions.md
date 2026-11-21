@@ -62,7 +62,8 @@ The app targets **WCAG 2.1 AA**. Follow the conventions in `docs/accessibility.m
 - Branch from `main`. Use Conventional Commits: `feat`, `fix`, `refactor`, `test`, `docs`, `build`, `ci`, `chore` (Dependabot uses `build(deps):` and `ci(deps):`).
 - **`main` is protected** by the "Protect main" ruleset:
   - Every change goes through a pull request and is **squash-merged** (linear history, signed commits).
-  - A PR can merge only after CodeQL has scanned it (`.github/workflows/codeql.yml`).
+  - A PR can merge only after CodeQL has scanned it (`.github/workflows/codeql.yml`) and the four CI checks have passed: `Typecheck`, `Lint`, `Test` and `E2E` (`.github/workflows/ci.yml`, the same commands as `yarn check`). The branch must also be up to date with `main`.
+  - If you add a script to `yarn check`, add a matching job to `ci.yml` and to the ruleset's required checks.
   - Force pushes and deleting `main` are blocked.
 - **One PR per feature or concern.** Dependent work goes in a stacked series, each PR based on the previous branch and passing `yarn check` on its own. After squash-merging the bottom PR, rebase the rest of the stack onto `main`:
 

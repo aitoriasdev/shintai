@@ -11,7 +11,10 @@ export default defineConfig({
   testMatch: '**/*.e2e.ts',
   // All tests share one API process and database, which is reset before each test.
   workers: 1,
-  reporter: 'list',
+  // A stray `test.only` would silently skip the rest of the suite in CI.
+  forbidOnly: Boolean(process.env.CI),
+  // On GitHub Actions, failures are also annotated on the pull request's diff.
+  reporter: process.env.GITHUB_ACTIONS ? [['github'], ['list']] : 'list',
   use: {
     baseURL: `http://127.0.0.1:${PORT}`,
     trace: 'retain-on-failure',
