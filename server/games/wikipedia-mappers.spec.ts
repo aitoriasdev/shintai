@@ -1,5 +1,6 @@
+import { gameDetailsSchema } from '@contracts/game'
 import { describe, expect, it } from 'vitest'
-import { cleanTitle, extractYear, formatGenre, formatWikidataDate, parseFacts, sortByRank, toGameSummary } from './wikipedia-mappers'
+import { cleanTitle, extractYear, formatGenre, parseFacts, sortByRank, toGameSummary, toIsoReleaseDate } from './wikipedia-mappers'
 
 describe('cleanTitle', () => {
   it.each([
@@ -60,12 +61,23 @@ it('formatGenre strips the "video game" suffix and capitalizes', () => {
   expect(formatGenre('platformer')).toBe('Platformer')
 })
 
-describe('formatWikidataDate', () => {
-  it('honors precision', () => {
-    expect(formatWikidataDate('2017-03-03T00:00:00Z', 11)).toBe('March 3, 2017')
-    expect(formatWikidataDate('2017-03-01T00:00:00Z', 10)).toBe('March 2017')
-    expect(formatWikidataDate('2017-01-01T00:00:00Z', 9)).toBe('2017')
-    expect(formatWikidataDate('garbage', 11)).toBeNull()
+describe('toIsoReleaseDate', () => {
+  it('keeps only the precision Wikidata has, as an ISO 8601 date', () => {
+    expect(toIsoReleaseDate('+2017-03-03T00:00:00Z', 11)).toBe('2017-03-03')
+    expect(toIsoReleaseDate('2017-03-01T00:00:00Z', 10)).toBe('2017-03')
+    expect(toIsoReleaseDate('2017-01-01T00:00:00Z', 9)).toBe('2017')
+    expect(toIsoReleaseDate('2017-00-00T00:00:00Z', 11)).toBe('2017')
+    expect(toIsoReleaseDate('2017-03-00T00:00:00Z', 11)).toBe('2017-03')
+  })
+
+  it('returns null for times it cannot read, including dates before the common era', () => {
+    expect(toIsoReleaseDate('garbage', 11)).toBeNull()
+    expect(toIsoReleaseDate('-0500-01-01T00:00:00Z', 9)).toBeNull()
+  })
+
+  it('always produces a date the contract accepts', () => {
+    for (const date of ['2017', '2017-03', '2017-03-03']) expect(gameDetailsSchema.shape.releaseDate.parse(date)).toBe(date)
+    expect(gameDetailsSchema.shape.releaseDate.safeParse('March 3, 2017').success).toBe(false)
   })
 })
 

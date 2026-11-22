@@ -23,7 +23,6 @@ export interface SparqlRow {
 const DISAMBIGUATION = /\s*\((?:[^()]*\b(?:video )?games?\b[^()]*)\)$/i
 const YEAR = /\b(19[5-9]\d|20\d{2})\b/
 const QID = /^Q\d+$/
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 /** "Celeste (video game)" → "Celeste", "Doom (1993 video game)" → "Doom". */
 export function cleanTitle(title: string): string {
@@ -66,15 +65,17 @@ export function formatGenre(label: string): string {
   return trimmed.charAt(0).toUpperCase() + trimmed.slice(1)
 }
 
-/** Formats a Wikidata time honoring its precision (9 = year, 10 = month, 11 = day). */
-export function formatWikidataDate(time: string, precision: number): string | null {
-  const match = time.match(/^[+-]?(\d{4})-(\d{2})-(\d{2})/)
+/**
+ * Turns a Wikidata time into an ISO 8601 date that is only as precise as Wikidata is (9 = year, 10 = month,
+ * 11 = day): `2017`, `2017-03` or `2017-03-03`. The UI formats it in the user's language.
+ */
+export function toIsoReleaseDate(time: string, precision: number): string | null {
+  const match = time.match(/^\+?(\d{4})-(\d{2})-(\d{2})/)
   if (!match) return null
   const [, year, month, day] = match
   if (precision <= 9 || month === '00') return year
-  const monthName = MONTHS[Number(month) - 1]
-  if (precision === 10 || day === '00') return `${monthName} ${year}`
-  return `${monthName} ${Number(day)}, ${year}`
+  if (precision === 10 || day === '00') return `${year}-${month}`
+  return `${year}-${month}-${day}`
 }
 
 type Facts = Pick<GameDetails, 'releaseDate' | 'platforms' | 'genres' | 'developers' | 'publishers'>
@@ -97,7 +98,7 @@ export function parseFacts(rows: SparqlRow[]): Facts {
   }
 
   return {
-    releaseDate: earliest ? formatWikidataDate(earliest.time, earliest.precision) : null,
+    releaseDate: earliest ? toIsoReleaseDate(earliest.time, earliest.precision) : null,
     platforms: [...sets.platform],
     genres: [...sets.genre],
     developers: [...sets.developer],

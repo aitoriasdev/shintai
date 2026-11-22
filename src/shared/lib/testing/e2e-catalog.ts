@@ -17,7 +17,7 @@ export const DETAILS: GameDetails = {
   extract: 'A wonderful game.',
   coverUrl: null,
   wikipediaUrl: 'https://en.wikipedia.org/wiki/Example',
-  releaseDate: 'January 1, 2020',
+  releaseDate: '2020-01-01',
   platforms: ['Windows'],
   genres: ['Platformer'],
   developers: ['Indie Studio'],

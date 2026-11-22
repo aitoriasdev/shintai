@@ -627,9 +627,20 @@
             "format": "uri"
           },
           "releaseDate": {
-            "type": [
-              "string",
-              "null"
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^\\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[12]\\d|3[01]))?)?$",
+                "description": "Earliest release date from Wikidata, ISO 8601, only as precise as Wikidata is (year, month or day).",
+                "examples": [
+                  "2013-09-17",
+                  "2013-09",
+                  "2013"
+                ]
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "platforms": {

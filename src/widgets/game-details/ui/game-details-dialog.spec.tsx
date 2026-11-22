@@ -1,16 +1,20 @@
 import type { GameDetails } from '@contracts/game'
 import { afterEach, expect, it, vi } from 'vitest'
+import { setLocale } from '@/shared/i18n/i18n-store'
 import { fakeApi, renderWithProviders } from '@/shared/lib/testing/render-with-providers'
 import { makeGame, problemResponse } from '@/shared/lib/testing/fixtures'
 import { GameDetailsDialog } from './game-details-dialog'
 
-afterEach(() => vi.restoreAllMocks())
+afterEach(() => {
+  vi.restoreAllMocks()
+  setLocale('en-GB')
+})
 
 const details: GameDetails = {
   extract: 'Celeste is a platform game.',
   coverUrl: null,
   wikipediaUrl: 'https://en.wikipedia.org/wiki/Celeste_(video_game)',
-  releaseDate: 'January 25, 2018',
+  releaseDate: '2018-01-25',
   platforms: ['Windows', 'Nintendo Switch'],
   genres: ['Platformer'],
   developers: ['Maddy Makes Games'],
@@ -27,7 +31,7 @@ it('shows game details, personal controls and facts', async () => {
   await expect.element(screen.getByRole('dialog', { name: 'Celeste' })).toBeVisible()
   await expect.element(screen.getByText('Celeste is a platform game.')).toBeVisible()
   await expect.element(screen.getByText('Nintendo Switch')).toBeVisible()
-  await expect.element(screen.getByText('January 25, 2018')).toBeVisible()
+  await expect.element(screen.getByText('25 January 2018')).toHaveAttribute('datetime', '2018-01-25')
   await expect.element(screen.getByText('Publishers')).not.toBeInTheDocument()
   await expect
     .element(screen.getByRole('link', { name: 'Read more on Wikipedia (opens in a new tab)' }))
@@ -43,6 +47,19 @@ it('shows game details, personal controls and facts', async () => {
 
   await screen.getByRole('button', { name: 'Close' }).click()
   expect(onClose).toHaveBeenCalled()
+})
+
+it('shows the release date in the UI language, not as English Wikipedia text', async () => {
+  setLocale('es-ES')
+  vi.spyOn(window, 'fetch').mockImplementation(
+    fakeApi(({ url }) => Response.json(url.pathname.startsWith('/api/games/') ? details : [])),
+  )
+  const screen = await renderWithProviders(<GameDetailsDialog game={makeGame()} onClose={vi.fn()} />)
+
+  const date = screen.getByText('25 de enero de 2018')
+  await expect.element(date).toBeVisible()
+  expect(date.element().closest('[lang]')?.getAttribute('lang')).not.toBe('en')
+  expect(screen.getByText('Nintendo Switch').element().closest('[lang]')?.getAttribute('lang')).toBe('en')
 })
 
 it('offers a retry when details fail to load', async () => {

@@ -37,4 +37,4 @@ Use `type` to tell errors apart: `title` never changes for a type, and `detail` 
 
 ## Data
 
-Your library lives in a SQLite file (`SHINTAI_DB_PATH`, `./data/shintai.db` by default). The catalogue comes from English Wikipedia and Wikidata, so game titles, descriptions and facts are in English.
+Your library lives in a SQLite file (`SHINTAI_DB_PATH`, `./data/shintai.db` by default). The catalogue comes from English Wikipedia and Wikidata, so game titles, descriptions and facts are in English. Release dates are ISO 8601 (`2013-09-17`, or `2013-09` and `2013` when Wikidata knows only the month or year), so clients can format them in any language.

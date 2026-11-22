@@ -7,6 +7,8 @@ import { GameCover } from '@/entities/game/ui/game-cover'
 import { CompletedButton } from '@/features/toggle-completed/ui/completed-button'
 import { FavoriteButton } from '@/features/toggle-favorite/ui/favorite-button'
 import { describeError } from '@/shared/i18n/describe-error'
+import { formatReleaseDate } from '@/shared/i18n/format-release-date'
+import type { Locale } from '@/shared/i18n/locales'
 import type { Messages } from '@/shared/i18n/messages/en-gb'
 import { useI18n } from '@/shared/i18n/use-i18n'
 import { cn } from '@/shared/lib/cn'
@@ -19,27 +21,39 @@ const TITLE_ID = 'game-details-title'
 /** Wikipedia and Wikidata text is English whatever the UI language (3.1.2 Language of Parts). */
 const WIKIPEDIA_LANG = 'en'
 
-function Facts({ details, t }: { details: GameDetails; t: Messages }) {
+const pill = 'rounded-full bg-surface-2 px-2.5 py-1 text-xs text-text'
+
+function Facts({ details, locale, t }: { details: GameDetails; locale: Locale; t: Messages }) {
   const facts = [
-    [t.details.released, details.releaseDate ? [details.releaseDate] : []],
     [t.details.platforms, details.platforms],
     [t.details.genres, details.genres],
     [t.details.developers, details.developers],
     [t.details.publishers, details.publishers],
   ] as const
   const visible = facts.filter(([, values]) => values.length > 0)
-  if (visible.length === 0) return null
+  if (visible.length === 0 && !details.releaseDate) return null
 
   return (
     <section>
       <h3 className="sr-only">{t.details.facts}</h3>
       <dl className="grid gap-x-6 gap-y-4 border-t border-border pt-5 sm:grid-cols-2">
+        {details.releaseDate && (
+          <div>
+            <dt className="mb-1.5 text-sm font-medium text-muted">{t.details.released}</dt>
+            {/* Formatted in the UI language, so unlike the other facts it is not marked as English. */}
+            <dd className="flex">
+              <time dateTime={details.releaseDate} className={pill}>
+                {formatReleaseDate(locale, details.releaseDate)}
+              </time>
+            </dd>
+          </div>
+        )}
         {visible.map(([term, values]) => (
           <div key={term}>
             <dt className="mb-1.5 text-sm font-medium text-muted">{term}</dt>
             <dd lang={WIKIPEDIA_LANG} className="flex flex-wrap gap-1.5">
               {values.map((value) => (
-                <span key={value} className="rounded-full bg-surface-2 px-2.5 py-1 text-xs text-text">
+                <span key={value} className={pill}>
                   {value}
                 </span>
               ))}
@@ -52,7 +66,7 @@ function Facts({ details, t }: { details: GameDetails; t: Messages }) {
 }
 
 function Body({ game }: { game: GameSummary }) {
-  const { t } = useI18n()
+  const { locale, t } = useI18n()
   const details = useQuery(gameQueries.details(game))
   const [expanded, setExpanded] = useState(false)
   const extractId = useId()
@@ -123,7 +137,7 @@ function Body({ game }: { game: GameSummary }) {
                 </button>
               </section>
             )}
-            <Facts details={details.data} t={t} />
+            <Facts details={details.data} locale={locale} t={t} />
             <a
               href={details.data.wikipediaUrl}
               target="_blank"

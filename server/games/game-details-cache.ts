@@ -1,6 +1,7 @@
-import type { GameDetails } from '@contracts/game'
+import { type GameDetails, gameDetailsSchema } from '@contracts/game'
 import type { DatabaseSync } from 'node:sqlite'
 import { inject, injectable } from 'tsyringe'
+import { z } from 'zod'
 import { TOKENS, type Clock } from '../tokens'
 
 /** SQLite-backed cache so game details are fetched from Wikimedia only once in a while. */
@@ -11,11 +12,19 @@ export class GameDetailsCache {
     @inject(TOKENS.Clock) private readonly clock: Clock,
   ) {}
 
+  /**
+   * The cached details, or null when there are none, they are too old, or they were written in an older
+   * shape of the contract (they are then fetched again and overwritten).
+   */
   get(pageId: number, maxAgeMs: number): GameDetails | null {
     const row = this.db
       .prepare('SELECT payload FROM game_details_cache WHERE page_id = ? AND fetched_at >= ?')
       .get(pageId, this.clock.now() - maxAgeMs) as { payload: string } | undefined
-    return row ? (JSON.parse(row.payload) as GameDetails) : null
+    if (!row) return null
+    const cached = gameDetailsSchema.safeParse(JSON.parse(row.payload))
+    if (cached.success) return cached.data
+    console.warn(`Cached details for page ${pageId} no longer match the contract; fetching them again.`, z.prettifyError(cached.error))
+    return null
   }
 
   set(pageId: number, details: GameDetails): void {

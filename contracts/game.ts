@@ -24,8 +24,18 @@ export const gameDetailsSchema = z.object({
   /** Larger cover art than the summary's thumbnail, when there is one. */
   coverUrl: z.url().nullable(),
   wikipediaUrl: z.url(),
-  /** Earliest release date from Wikidata, formatted in English (e.g. "September 17, 2013"). */
-  releaseDate: z.string().nullable(),
+  /**
+   * Earliest release date from Wikidata as an ISO 8601 calendar date, only as precise as Wikidata is:
+   * `2013`, `2013-09` or `2013-09-17`. The UI formats it in the user's language.
+   */
+  releaseDate: z
+    .string()
+    .regex(/^\d{4}(-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?)?$/)
+    .meta({
+      description: 'Earliest release date from Wikidata, ISO 8601, only as precise as Wikidata is (year, month or day).',
+      examples: ['2013-09-17', '2013-09', '2013'],
+    })
+    .nullable(),
   platforms: z.array(z.string()),
   genres: z.array(z.string()),
   developers: z.array(z.string()),
