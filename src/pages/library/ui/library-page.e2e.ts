@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
   await resetLibrary(page)
   await stubCatalog(page)
   await page.goto('/')
-  await page.getByRole('button', { name: 'Favorite: Celeste' }).click()
+  await page.getByRole('button', { name: 'Favourite: Celeste' }).click()
   await page.getByRole('button', { name: 'Completed: Hades' }).click()
   await expect(page.getByRole('link', { name: 'My library (2 games)' })).toBeVisible()
   await page.getByRole('link', { name: /My library/ }).click()
@@ -17,7 +17,7 @@ test('filters, searches and removes library games', async ({ page }) => {
   await expect(page.getByRole('listitem')).toHaveCount(2)
   await expect(page.getByRole('definition').filter({ hasText: '50%' })).toBeVisible()
 
-  await page.getByRole('radio', { name: 'Favorites' }).check()
+  await page.getByRole('radio', { name: 'Favourites' }).check()
   await expect(page.getByRole('listitem')).toHaveCount(1)
   await expect(page.getByRole('status').filter({ hasText: '1 of 2 games shown' })).toBeAttached()
   await page.getByRole('radio', { name: 'All' }).check()
@@ -36,10 +36,10 @@ test('filters, searches and removes library games', async ({ page }) => {
 })
 
 test('keeps keyboard focus when a card leaves the filtered view (2.4.3)', async ({ page }) => {
-  await page.getByRole('radio', { name: 'Favorites' }).check()
+  await page.getByRole('radio', { name: 'Favourites' }).check()
   await expect(page.getByRole('listitem')).toHaveCount(1)
 
-  await page.getByRole('button', { name: 'Favorite: Celeste' }).focus()
+  await page.getByRole('button', { name: 'Favourite: Celeste' }).focus()
   await page.keyboard.press('Enter')
 
   await expect(page.getByRole('heading', { name: 'No games match these filters' })).toBeVisible()

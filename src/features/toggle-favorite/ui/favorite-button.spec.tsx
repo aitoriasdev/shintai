@@ -18,7 +18,7 @@ it('toggles the favorite state through the API', async () => {
   )
 
   const screen = await renderWithProviders(<FavoriteButton game={makeGame()} />)
-  const button = screen.getByRole('button', { name: 'Favorite: Celeste' })
+  const button = screen.getByRole('button', { name: 'Favourite: Celeste' })
   await expect.element(button).toHaveAttribute('aria-pressed', 'false')
 
   await button.click()

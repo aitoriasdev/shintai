@@ -1,5 +1,6 @@
 import { Gamepad2 } from 'lucide-react'
 import { useState } from 'react'
+import { useI18n } from '@/shared/i18n/use-i18n'
 import { cn } from '@/shared/lib/cn'
 
 interface GameCoverProps {
@@ -12,8 +13,9 @@ interface GameCoverProps {
   decorative?: boolean
 }
 
-/** Box art with a lazy, fade-in image and a generated fallback when there is no cover. */
+/** Box art with a lazy, fade-in image, and a plain title label (like a blank cartridge) when there is no cover. */
 export function GameCover({ title, src, className, eager = false, decorative = false }: GameCoverProps) {
+  const { t } = useI18n()
   const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading')
   // A new source (e.g. the dialog swapping the thumbnail for a larger image) deserves a fresh attempt.
   const [currentSrc, setCurrentSrc] = useState(src)
@@ -28,7 +30,7 @@ export function GameCover({ title, src, className, eager = false, decorative = f
       {showImage ? (
         <img
           src={src}
-          alt={decorative ? '' : `${title} cover art`}
+          alt={decorative ? '' : t.game.coverAlt(title)}
           loading={eager ? 'eager' : 'lazy'}
           decoding="async"
           onLoad={() => setStatus('loaded')}
@@ -38,16 +40,16 @@ export function GameCover({ title, src, className, eager = false, decorative = f
       ) : (
         <div
           role={decorative ? undefined : 'img'}
-          aria-label={decorative ? undefined : `${title} (no cover art available)`}
-          className="flex size-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-accent/30 via-surface-2 to-surface p-4 text-center"
+          aria-label={decorative ? undefined : t.game.noCover(title)}
+          className="flex size-full flex-col justify-between border-t-4 border-accent p-4"
         >
-          <Gamepad2 className="size-8 text-accent" aria-hidden="true" />
-          <span className="line-clamp-3 text-sm font-semibold text-text" aria-hidden="true">
+          <Gamepad2 className="size-6 text-accent" aria-hidden="true" />
+          <span className="line-clamp-4 text-lg leading-tight font-bold tracking-tight text-balance text-text" aria-hidden="true">
             {title}
           </span>
         </div>
       )}
-      {showImage && status === 'loading' && <div className="absolute inset-0 animate-pulse bg-surface-2" aria-hidden="true" />}
+      {showImage && status === 'loading' && <div className="absolute inset-0 animate-pulse bg-surface-2 motion-reduce:animate-none" aria-hidden="true" />}
     </div>
   )
 }

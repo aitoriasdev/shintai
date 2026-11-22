@@ -15,8 +15,8 @@ it('renders a card per game with library status and quick actions', async () => 
 
   await expect.element(screen.getByRole('listitem')).toHaveLength(2)
   await expect.element(screen.getByText('Your score: 9 out of 10')).toBeInTheDocument()
-  await expect.element(screen.getByRole('button', { name: 'Favorite: Celeste' })).toHaveAttribute('aria-pressed', 'true')
-  await expect.element(screen.getByRole('button', { name: 'Favorite: Hades' })).toHaveAttribute('aria-pressed', 'false')
+  await expect.element(screen.getByRole('button', { name: 'Favourite: Celeste' })).toHaveAttribute('aria-pressed', 'true')
+  await expect.element(screen.getByRole('button', { name: 'Favourite: Hades' })).toHaveAttribute('aria-pressed', 'false')
 
   await screen.getByRole('button', { name: 'Hades', exact: true }).click()
   expect(onOpen).toHaveBeenCalledWith(hades)
@@ -46,7 +46,7 @@ it('moves focus to the next card when the focused card is removed (2.4.3)', asyn
   const outerWilds = makeGame({ id: 'Q3', pageId: 3, title: 'Outer Wilds' })
   const screen = await renderWithProviders(<GameGrid label="Results" games={[celeste, hades, outerWilds]} onOpen={vi.fn()} />)
 
-  ;(screen.getByRole('button', { name: 'Favorite: Hades' }).element() as HTMLElement).focus()
+  ;(screen.getByRole('button', { name: 'Favourite: Hades' }).element() as HTMLElement).focus()
   await screen.rerender(<GameGrid label="Results" games={[celeste, outerWilds]} onOpen={vi.fn()} />)
   await expect.element(screen.getByRole('button', { name: 'Outer Wilds', exact: true })).toHaveFocus()
 

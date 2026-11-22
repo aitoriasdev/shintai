@@ -5,10 +5,11 @@ import { useLibraryEntry } from '@/entities/library/api/library-queries'
 import { EntryBadges } from '@/entities/library/ui/entry-badges'
 import { CompletedButton } from '@/features/toggle-completed/ui/completed-button'
 import { FavoriteButton } from '@/features/toggle-favorite/ui/favorite-button'
+import { useI18n } from '@/shared/i18n/use-i18n'
 import { useInView } from '@/shared/lib/use-in-view'
 import { Spinner } from '@/shared/ui/spinner'
 
-export const GRID_CLASS = 'grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+export const GRID_CLASS = 'grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 sm:gap-x-5 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
 
 function GameGridItem({ game, onOpen }: { game: GameSummary; onOpen: (game: GameSummary) => void }) {
   const entry = useLibraryEntry(game.id)
@@ -86,6 +87,7 @@ function useFocusRecovery(games: GameSummary[]) {
 export function GameGrid({ games, onOpen, label, hasMore = false, isLoadingMore = false, onLoadMore }: GameGridProps) {
   const { ref, inView } = useInView<HTMLDivElement>()
   const { listRef, onFocus, onBlur } = useFocusRecovery(games)
+  const { t } = useI18n()
 
   useEffect(() => {
     if (inView && hasMore && !isLoadingMore) onLoadMore?.()
@@ -103,7 +105,7 @@ export function GameGrid({ games, onOpen, label, hasMore = false, isLoadingMore 
       {hasMore && (
         <div ref={ref} className="flex justify-center pt-8">
           {isLoadingMore ? (
-            <Spinner label="Loading more games" />
+            <Spinner label={t.discover.loadingMore} />
           ) : (
             // Keyboard and switch users get an explicit control in addition to infinite scroll.
             <button
@@ -111,7 +113,7 @@ export function GameGrid({ games, onOpen, label, hasMore = false, isLoadingMore 
               onClick={onLoadMore}
               className="h-11 rounded-full border border-control bg-surface px-5 text-sm font-medium text-text hover:bg-surface-2"
             >
-              Load more games
+              {t.discover.loadMore}
             </button>
           )}
         </div>

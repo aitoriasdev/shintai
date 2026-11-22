@@ -1,6 +1,7 @@
 import type { GameSummary } from '@contracts/game'
 import type { EntryPatch, LibraryEntry } from '@contracts/library'
 import { queryOptions, useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
+import { getMessages } from '@/shared/i18n/i18n-store'
 import { showError } from '@/shared/lib/error-notifications'
 import { applyPatch, withoutEntry } from '../lib/apply-patch'
 import { fetchLibrary, removeEntry, upsertEntry } from './library-api'
@@ -78,7 +79,7 @@ function confirm(queryClient: QueryClient, update: (confirmed: LibraryEntry[]) =
 
 function fail(queryClient: QueryClient, context: MutationContext | undefined) {
   recompute(queryClient, context)
-  showError('Could not save your change, so it was undone. Is the Shintai API running?')
+  showError(getMessages().errors.saveFailed)
 }
 
 /** When the last write of a chain settles, show exactly what the server confirmed, then re-sync. */

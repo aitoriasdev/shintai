@@ -33,7 +33,7 @@ it('shows game details, personal controls and facts', async () => {
     .element(screen.getByRole('link', { name: 'Read more on Wikipedia (opens in a new tab)' }))
     .toHaveAttribute('href', details.wikipediaUrl)
   await expect.element(screen.getByRole('button', { name: 'Add to library' })).toBeVisible()
-  await expect.element(screen.getByRole('button', { name: 'Favorite: Celeste' })).toBeVisible()
+  await expect.element(screen.getByRole('button', { name: 'Favourite: Celeste' })).toBeVisible()
   await expect.element(screen.getByRole('group', { name: 'Your score' })).toBeVisible()
 
   const showMore = screen.getByRole('button', { name: 'Show more' })

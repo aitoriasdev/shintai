@@ -1,6 +1,7 @@
 import { AlertTriangle, X } from 'lucide-react'
 import { useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
+import { useI18n } from '@/shared/i18n/use-i18n'
 import { dismissError, getCurrentError, subscribeToErrors } from '@/shared/lib/error-notifications'
 
 /**
@@ -9,6 +10,7 @@ import { dismissError, getCurrentError, subscribeToErrors } from '@/shared/lib/e
  */
 export function ErrorToast() {
   const text = useSyncExternalStore(subscribeToErrors, getCurrentError)
+  const { t } = useI18n()
   return createPortal(
     <div role="alert" className="fixed inset-x-4 bottom-4 z-[70] flex justify-center sm:inset-x-auto sm:right-6 sm:bottom-6">
       {text && (
@@ -18,7 +20,7 @@ export function ErrorToast() {
           <button
             type="button"
             onClick={dismissError}
-            aria-label="Dismiss"
+            aria-label={t.app.dismiss}
             className="-m-2 grid size-9 shrink-0 place-items-center rounded-full text-muted hover:text-text pointer-coarse:size-11"
           >
             <X className="size-4" aria-hidden="true" />

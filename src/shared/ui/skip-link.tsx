@@ -1,5 +1,8 @@
+import { useI18n } from '@/shared/i18n/use-i18n'
+
 /** 2.4.1 Bypass Blocks: first focusable element, visible only while focused. */
-export function SkipLink({ targetId, children = 'Skip to main content' }: { targetId: string; children?: string }) {
+export function SkipLink({ targetId }: { targetId: string }) {
+  const { t } = useI18n()
   return (
     <a
       href={`#${targetId}`}
@@ -8,9 +11,9 @@ export function SkipLink({ targetId, children = 'Skip to main content' }: { targ
         event.preventDefault()
         document.getElementById(targetId)?.focus()
       }}
-      className="fixed top-3 left-3 z-[60] -translate-y-24 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-on-accent focus:translate-y-0"
+      className="fixed top-3 left-3 z-60 -translate-y-24 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-on-accent focus:translate-y-0"
     >
-      {children}
+      {t.app.skipLink}
     </a>
   )
 }

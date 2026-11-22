@@ -21,6 +21,7 @@ Never skip a failing check, never commit with `--no-verify`, and never relax a l
 - `server/`: the local API (Hono, tsyringe, `node:sqlite`). Every dependency is injected with `@inject(token)`. The composition root is `server/container.ts`, and schema changes are new entries in `server/database/migrations.ts` (never edit a shipped migration).
 - `contracts/`: Zod schemas and inferred types shared by the API and the UI, one file per domain. The UI imports types only, so Zod stays out of the bundle.
   - The OpenAPI document (`docs/api/openapi.json`, published by Scalar) is generated from these schemas. After changing a route or a contract, run `yarn openapi`; a test fails while the file is out of date.
+- **UI copy** lives in `src/shared/i18n/messages/`: `en-gb.ts` is the source (British spelling), `es-es.ts` implements the same `Messages` type. Never hard-code a string the user can see or hear; read it from `useI18n()` (or `getMessages()` outside React).
 - **Folder boundaries** (oxlint `no-restricted-imports`, overrides in `.oxlintrc.json`):
   - `src/` never imports `server/`, `zod` or `node:*`, and imports `@contracts/*` with `import type` only. Playwright files (`*.e2e.ts`, `src/shared/lib/testing/`) are exempt, because they run in Node.
   - `server/` never imports `src/`, and imports contracts through `@contracts/*`.
@@ -37,7 +38,7 @@ Never skip a failing check, never commit with `--no-verify`, and never relax a l
 - **Tests sit next to the code they test.**
   - `*.spec.ts(x)` run in Vitest: under `src/` in Browser Mode (Playwright Chromium, with the real stylesheet), and under `server/` and `contracts/` in Node.
   - `*.e2e.ts` run in Playwright against the production build, the real API and an in-memory SQLite database.
-- **Test behaviour, not implementation.** Query by role and accessible name (`getByRole('button', { name: 'Favorite: Celeste' })`).
+- **Test behaviour, not implementation.** Query by role and accessible name (`getByRole('button', { name: 'Favourite: Celeste' })`).
 - In Vitest browser mode, `toHaveTextContent` compares the whole text (a regular expression is not treated as one) and `getByText` is exact. To check part of an element, find the part and assert on that.
 - Every new page or dialog gets an `expectAccessible(page)` axe check in its `*.e2e.ts`.
 - Bug fixes come with a regression test that fails without the fix.

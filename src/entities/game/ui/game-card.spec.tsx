@@ -10,7 +10,7 @@ it('exposes the title as a heading with a single named button', async () => {
   const screen = await renderWithProviders(<GameCard game={game} onOpen={onOpen} badges={<span>Completed</span>} />)
 
   await expect.element(screen.getByRole('heading', { level: 2, name: 'Celeste' })).toBeVisible()
-  await expect.element(screen.getByText('2018 video game')).toBeVisible()
+  await expect.element(screen.getByText('2018', { exact: true })).toBeVisible()
   // The cover repeats the title, so it is hidden from assistive tech.
   await expect.element(screen.getByRole('img')).not.toBeInTheDocument()
 
@@ -24,4 +24,16 @@ it('can be opened with the keyboard', async () => {
   await userEvent.tab()
   await userEvent.keyboard('{Enter}')
   expect(onOpen).toHaveBeenCalledOnce()
+})
+
+it("falls back to Wikipedia's English description, then to a generic label, when the year is unknown", async () => {
+  const screen = await renderWithProviders(
+    <>
+      <GameCard game={makeGame({ year: null, description: 'Multiplayer game platform' })} onOpen={vi.fn()} />
+      <GameCard game={makeGame({ id: 'Q2', year: null, description: null })} onOpen={vi.fn()} />
+    </>,
+  )
+  // 3.1.2 Language of Parts: Wikipedia text is English whatever the UI language.
+  await expect.element(screen.getByText('Multiplayer game platform')).toHaveAttribute('lang', 'en')
+  await expect.element(screen.getByText('Video game')).toBeVisible()
 })

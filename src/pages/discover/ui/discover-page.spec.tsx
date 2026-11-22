@@ -39,7 +39,7 @@ it('shows the API error with a retry', async () => {
     fakeApi(({ url }) => (url.pathname === '/api/library' ? Response.json([]) : problemResponse('upstream-unavailable'))),
   )
   const screen = await renderWithProviders(<DiscoverPage query="" onOpen={vi.fn()} />)
-  await expect.element(screen.getByText('Wikipedia is unavailable right now')).toBeVisible()
+  await expect.element(screen.getByText('Wikipedia is unavailable right now. Try again in a moment.')).toBeVisible()
   await expect.element(screen.getByRole('button', { name: 'Try again' })).toBeVisible()
 })
 

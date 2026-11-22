@@ -2,15 +2,16 @@ import type { GameSummary } from '@contracts/game'
 import { X } from 'lucide-react'
 import { useId, useState } from 'react'
 import { useLibraryEntry, useUpsertEntry } from '@/entities/library/api/library-queries'
+import { useI18n } from '@/shared/i18n/use-i18n'
 import { cn } from '@/shared/lib/cn'
 
 const SCORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const
 
 /** Score colors are paired with the number itself, so meaning never relies on color alone (1.4.1). */
 function scoreColor(score: number): string {
-  if (score >= 8) return 'bg-completed text-black'
-  if (score >= 5) return 'bg-score text-black'
-  return 'bg-danger text-black'
+  if (score >= 8) return 'bg-completed text-on-status'
+  if (score >= 5) return 'bg-score text-on-status'
+  return 'bg-danger text-on-status'
 }
 
 /** Personal 1–10 score as a native radio group (arrow keys change it), plus an explicit clear button. */
@@ -18,6 +19,7 @@ export function ScorePicker({ game }: { game: GameSummary }) {
   const savedScore = useLibraryEntry(game.id)?.score ?? null
   const upsert = useUpsertEntry()
   const name = useId()
+  const { t } = useI18n()
 
   // Controlled radios must reflect a choice synchronously; the cache catches up a tick later
   // (and rolls back on failure), so mirror it locally to avoid a checked/unchecked flicker.
@@ -35,7 +37,7 @@ export function ScorePicker({ game }: { game: GameSummary }) {
 
   return (
     <fieldset className="space-y-2">
-      <legend className="text-xs font-semibold tracking-wider text-muted uppercase">Your score</legend>
+      <legend className="text-sm font-medium text-muted">{t.game.yourScore}</legend>
       <div className="flex items-center gap-2">
         <div className="grid flex-1 grid-cols-5 gap-1 sm:grid-cols-10">
           {SCORES.map((value) => (
@@ -56,7 +58,7 @@ export function ScorePicker({ game }: { game: GameSummary }) {
                 className="absolute inset-0 cursor-pointer appearance-none rounded-lg focus:outline-none"
               />
               {value}
-              <span className="sr-only"> out of 10</span>
+              <span className="sr-only"> {t.game.outOfTen}</span>
             </label>
           ))}
         </div>
@@ -67,7 +69,8 @@ export function ScorePicker({ game }: { game: GameSummary }) {
           className="inline-flex h-11 shrink-0 items-center gap-1 rounded-lg px-2 text-sm text-muted transition-colors hover:text-text disabled:opacity-40"
         >
           <X className="size-4" aria-hidden="true" />
-          Clear<span className="sr-only"> score</span>
+          {t.details.clear}
+          <span className="sr-only"> {t.details.clearTarget}</span>
         </button>
       </div>
     </fieldset>
