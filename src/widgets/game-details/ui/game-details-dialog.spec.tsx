@@ -1,7 +1,7 @@
 import type { GameDetails } from '@contracts/game'
 import { afterEach, expect, it, vi } from 'vitest'
 import { fakeApi, renderWithProviders } from '@/shared/lib/testing/render-with-providers'
-import { makeGame } from '@/shared/lib/testing/fixtures'
+import { makeGame, problemResponse } from '@/shared/lib/testing/fixtures'
 import { GameDetailsDialog } from './game-details-dialog'
 
 afterEach(() => vi.restoreAllMocks())
@@ -48,7 +48,7 @@ it('shows game details, personal controls and facts', async () => {
 it('offers a retry when details fail to load', async () => {
   vi.spyOn(window, 'fetch').mockImplementation(
     fakeApi(({ url }) =>
-      url.pathname.startsWith('/api/games/') ? Response.json({ error: 'Wikipedia is unavailable right now' }, { status: 502 }) : Response.json([]),
+      url.pathname.startsWith('/api/games/') ? problemResponse('upstream-unavailable') : Response.json([]),
     ),
   )
   const screen = await renderWithProviders(<GameDetailsDialog game={makeGame()} onClose={vi.fn()} />)

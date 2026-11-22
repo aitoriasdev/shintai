@@ -1,3 +1,4 @@
+import { PROBLEM_TYPE_BASE } from '@contracts/problem'
 import { Hono } from 'hono'
 import { describe, expect, it } from 'vitest'
 import { localOnly } from './local-only'
@@ -22,7 +23,10 @@ describe('localOnly', () => {
   })
 
   it('rejects other Hosts (DNS rebinding)', async () => {
-    expect((await request('GET', { Host: 'evil.example:4321' })).status).toBe(403)
+    const res = await request('GET', { Host: 'evil.example:4321' })
+    expect(res.status).toBe(403)
+    expect(res.headers.get('Content-Type')).toBe('application/problem+json')
+    expect(await res.json()).toMatchObject({ type: `${PROBLEM_TYPE_BASE}forbidden-host`, instance: '/api/data' })
   })
 
   it('allows same-origin JSON writes, including from the Vite dev server', async () => {

@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from 'vitest'
 import { fakeApi, renderWithProviders } from '@/shared/lib/testing/render-with-providers'
-import { makeGame } from '@/shared/lib/testing/fixtures'
+import { makeGame, problemResponse } from '@/shared/lib/testing/fixtures'
 import { DiscoverPage } from './discover-page'
 
 afterEach(() => vi.restoreAllMocks())
@@ -36,7 +36,7 @@ it('shows an empty state when nothing matches', async () => {
 
 it('shows the API error with a retry', async () => {
   vi.spyOn(window, 'fetch').mockImplementation(
-    fakeApi(({ url }) => (url.pathname === '/api/library' ? Response.json([]) : Response.json({ error: 'Wikipedia is unavailable right now' }, { status: 502 }))),
+    fakeApi(({ url }) => (url.pathname === '/api/library' ? Response.json([]) : problemResponse('upstream-unavailable'))),
   )
   const screen = await renderWithProviders(<DiscoverPage query="" onOpen={vi.fn()} />)
   await expect.element(screen.getByText('Wikipedia is unavailable right now')).toBeVisible()
@@ -49,7 +49,7 @@ it('keeps loaded games when the next page fails, and retries just that page', as
     fakeApi(({ url }) => {
       if (url.pathname === '/api/library') return Response.json([])
       if (!url.searchParams.has('offset')) return Response.json({ games: [makeGame({ title: 'Celeste' })], nextOffset: 24 })
-      if (failNextPage) return Response.json({ error: 'Wikipedia is unavailable right now' }, { status: 502 })
+      if (failNextPage) return problemResponse('upstream-unavailable')
       return Response.json({ games: [makeGame({ id: 'Q2', pageId: 2, title: 'Hades' })], nextOffset: null })
     }),
   )

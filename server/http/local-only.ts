@@ -1,4 +1,5 @@
 import type { MiddlewareHandler } from 'hono'
+import { problemResponse, typedProblem } from './problem'
 
 const LOOPBACK_HOSTNAMES = new Set(['localhost', '127.0.0.1', '[::1]', '::1'])
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS'])
@@ -39,17 +40,17 @@ function hasBody(request: Request): boolean {
  */
 export function localOnly(): MiddlewareHandler {
   return async (c, next) => {
-    if (!isLoopbackHost(c.req.header('Host'))) return c.json({ error: 'Forbidden host' }, 403)
+    if (!isLoopbackHost(c.req.header('Host'))) return problemResponse(c, typedProblem('forbidden-host', c.req.path))
 
     if (!SAFE_METHODS.has(c.req.method)) {
       const origin = c.req.header('Origin')
       const fetchSite = c.req.header('Sec-Fetch-Site')
       if ((origin && !isLoopbackOrigin(origin)) || fetchSite === 'cross-site') {
-        return c.json({ error: 'Cross-site requests are not allowed' }, 403)
+        return problemResponse(c, typedProblem('cross-site-request', c.req.path))
       }
       const contentType = c.req.header('Content-Type') ?? ''
       if (hasBody(c.req.raw) && !contentType.startsWith('application/json')) {
-        return c.json({ error: 'Request bodies must be application/json' }, 415)
+        return problemResponse(c, typedProblem('unsupported-media-type', c.req.path))
       }
     }
     await next()

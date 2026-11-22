@@ -1,0 +1,888 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Shintai API",
+    "version": "0.1.0",
+    "summary": "Local API behind the Shintai app: the game catalogue, your library and its backups.",
+    "description": "The API runs only on your machine and binds to `127.0.0.1`. It rejects non-loopback `Host` headers, cross-site writes and non-JSON request bodies. Errors are [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) Problem Details.",
+    "license": {
+      "name": "MIT",
+      "identifier": "MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:4321",
+      "description": "Default local server (`SHINTAI_PORT`)"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Games",
+      "description": "The catalogue, from English Wikipedia and Wikidata."
+    },
+    {
+      "name": "Library",
+      "description": "Your games, scores and flags, stored in SQLite."
+    },
+    {
+      "name": "Meta",
+      "description": "Health and this document."
+    }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "Meta"
+        ],
+        "operationId": "getHealth",
+        "summary": "Check that the API is running",
+        "responses": {
+          "200": {
+            "description": "The API is up.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "const": "ok"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "[forbidden-host](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#forbidden-host): The API only answers on this computer.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/openapi.json": {
+      "get": {
+        "tags": [
+          "Meta"
+        ],
+        "operationId": "getOpenApiDocument",
+        "summary": "Get this OpenAPI document",
+        "responses": {
+          "200": {
+            "description": "OpenAPI 3.1 document.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "[forbidden-host](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#forbidden-host): The API only answers on this computer.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/games/search": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "searchGames",
+        "summary": "Search or browse the catalogue",
+        "description": "Successful pages may be cached by the browser for an hour; errors never are.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "description": "Title to search for. Empty: the most notable games.",
+            "schema": {
+              "default": "",
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "required": false,
+            "description": "Only games first released in this year.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1950,
+              "maximum": 2100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Position of the first result, from `nextOffset` of the previous page.",
+            "schema": {
+              "default": 0,
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9999
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of games.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameSearchPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "[validation-failed](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#validation-failed): The request is not valid.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "[forbidden-host](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#forbidden-host): The API only answers on this computer.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "[upstream-unavailable](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#upstream-unavailable): Wikipedia is unavailable right now.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/games/{pageId}/details": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "getGameDetails",
+        "summary": "Get a game’s article intro and facts",
+        "description": "Cached in SQLite for 30 days.",
+        "parameters": [
+          {
+            "name": "pageId",
+            "in": "path",
+            "required": true,
+            "description": "English Wikipedia page id.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "qid",
+            "in": "query",
+            "required": false,
+            "description": "Wikidata Q-id, for the structured facts.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The game’s details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "[validation-failed](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#validation-failed): The request is not valid.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "[forbidden-host](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#forbidden-host): The API only answers on this computer.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "[game-not-found](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#game-not-found): The game was not found.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "[upstream-unavailable](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#upstream-unavailable): Wikipedia is unavailable right now.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/library": {
+      "get": {
+        "tags": [
+          "Library"
+        ],
+        "operationId": "listLibrary",
+        "summary": "List every library entry",
+        "responses": {
+          "200": {
+            "description": "All entries, most recently added first.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LibraryEntry"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "[forbidden-host](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#forbidden-host): The API only answers on this computer.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/library/{gameId}": {
+      "put": {
+        "tags": [
+          "Library"
+        ],
+        "operationId": "upsertLibraryEntry",
+        "summary": "Add a game and/or change its score and flags",
+        "description": "Creates the entry if needed, then applies `patch`. `game.id` must match the URL.",
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "path",
+            "required": true,
+            "description": "The game’s `id` (`GameSummary.id`).",
+            "schema": {
+              "type": "string",
+              "pattern": "^(Q\\d+|enwiki:\\d+)$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertEntryBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The saved entry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryEntry"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "[validation-failed](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#validation-failed): The request is not valid. [malformed-json](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#malformed-json): The request body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "[forbidden-host](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#forbidden-host): The API only answers on this computer. [cross-site-request](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#cross-site-request): Cross-site requests are not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "[unsupported-media-type](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#unsupported-media-type): Request bodies must be application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Library"
+        ],
+        "operationId": "removeLibraryEntry",
+        "summary": "Remove a game, with its score and flags",
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "path",
+            "required": true,
+            "description": "The game’s `id` (`GameSummary.id`).",
+            "schema": {
+              "type": "string",
+              "pattern": "^(Q\\d+|enwiki:\\d+)$"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removed."
+          },
+          "403": {
+            "description": "[forbidden-host](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#forbidden-host): The API only answers on this computer. [cross-site-request](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#cross-site-request): Cross-site requests are not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "[entry-not-found](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#entry-not-found): The game is not in the library.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "[unsupported-media-type](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#unsupported-media-type): Request bodies must be application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/library/backup": {
+      "get": {
+        "tags": [
+          "Library"
+        ],
+        "operationId": "exportLibraryBackup",
+        "summary": "Download a JSON backup",
+        "responses": {
+          "200": {
+            "description": "The whole library, as an attachment named `shintai-backup-YYYY-MM-DD.json`.",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LibraryBackup"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "[forbidden-host](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#forbidden-host): The API only answers on this computer.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Library"
+        ],
+        "operationId": "importLibraryBackup",
+        "summary": "Merge a JSON backup",
+        "description": "All or nothing: every entry is validated first. For each game, the newer entry wins.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibraryBackup"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "What the merge changed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "[validation-failed](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#validation-failed): The request is not valid. [malformed-json](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#malformed-json): The request body is not valid JSON.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "[forbidden-host](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#forbidden-host): The API only answers on this computer. [cross-site-request](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#cross-site-request): Cross-site requests are not allowed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "[unsupported-media-type](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#unsupported-media-type): Request bodies must be application/json.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GameSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^(Q\\d+|enwiki:\\d+)$"
+          },
+          "pageId": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "wikiTitle": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "coverUrl": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "pageId",
+          "title",
+          "wikiTitle",
+          "description",
+          "coverUrl",
+          "year"
+        ]
+      },
+      "GameDetails": {
+        "type": "object",
+        "properties": {
+          "extract": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "coverUrl": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uri"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "wikipediaUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "releaseDate": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "platforms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "developers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "publishers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "extract",
+          "coverUrl",
+          "wikipediaUrl",
+          "releaseDate",
+          "platforms",
+          "genres",
+          "developers",
+          "publishers"
+        ]
+      },
+      "GameSearchPage": {
+        "type": "object",
+        "properties": {
+          "games": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GameSummary"
+            }
+          },
+          "nextOffset": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "games",
+          "nextOffset"
+        ]
+      },
+      "LibraryEntry": {
+        "type": "object",
+        "properties": {
+          "game": {
+            "$ref": "#/components/schemas/GameSummary"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "completed": {
+            "type": "boolean"
+          },
+          "favorite": {
+            "type": "boolean"
+          },
+          "addedAt": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "updatedAt": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "game",
+          "score",
+          "completed",
+          "favorite",
+          "addedAt",
+          "updatedAt"
+        ]
+      },
+      "EntryPatch": {
+        "type": "object",
+        "properties": {
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "completed": {
+            "type": "boolean"
+          },
+          "favorite": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpsertEntryBody": {
+        "type": "object",
+        "properties": {
+          "game": {
+            "$ref": "#/components/schemas/GameSummary"
+          },
+          "patch": {
+            "default": {},
+            "$ref": "#/components/schemas/EntryPatch"
+          }
+        },
+        "required": [
+          "game"
+        ]
+      },
+      "LibraryBackup": {
+        "type": "object",
+        "properties": {
+          "app": {
+            "type": "string",
+            "const": "shintai"
+          },
+          "version": {
+            "type": "number",
+            "const": 1
+          },
+          "exportedAt": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "entries": {
+            "maxItems": 100000,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LibraryEntry"
+            }
+          }
+        },
+        "required": [
+          "app",
+          "version",
+          "exportedAt",
+          "entries"
+        ]
+      },
+      "ImportResult": {
+        "type": "object",
+        "properties": {
+          "added": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "updated": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "skipped": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "added",
+          "updated",
+          "skipped"
+        ]
+      },
+      "Problem": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "minimum": 400,
+            "maximum": 599
+          },
+          "title": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProblemFieldError"
+            }
+          }
+        },
+        "required": [
+          "type",
+          "status",
+          "title"
+        ]
+      },
+      "ProblemFieldError": {
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "string"
+          },
+          "pointer": {
+            "type": "string"
+          },
+          "parameter": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "detail"
+        ]
+      }
+    }
+  }
+}
