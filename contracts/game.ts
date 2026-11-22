@@ -18,22 +18,29 @@ export const gameSummarySchema = z.object({
 export type GameSummary = z.infer<typeof gameSummarySchema>
 
 /** Rich, on-demand information about a game. */
-export interface GameDetails {
-  extract: string | null
-  coverUrl: string | null
-  wikipediaUrl: string
-  releaseDate: string | null
-  platforms: string[]
-  genres: string[]
-  developers: string[]
-  publishers: string[]
-}
+export const gameDetailsSchema = z.object({
+  /** Plain-text intro of the Wikipedia article. */
+  extract: z.string().nullable(),
+  /** Larger cover art than the summary's thumbnail, when there is one. */
+  coverUrl: z.url().nullable(),
+  wikipediaUrl: z.url(),
+  /** Earliest release date from Wikidata, formatted in English (e.g. "September 17, 2013"). */
+  releaseDate: z.string().nullable(),
+  platforms: z.array(z.string()),
+  genres: z.array(z.string()),
+  developers: z.array(z.string()),
+  publishers: z.array(z.string()),
+})
 
-export interface GameSearchPage {
-  games: GameSummary[]
+export type GameDetails = z.infer<typeof gameDetailsSchema>
+
+export const gameSearchPageSchema = z.object({
+  games: z.array(gameSummarySchema),
   /** Offset for the next page, or null when there are no more results. */
-  nextOffset: number | null
-}
+  nextOffset: z.number().int().nonnegative().nullable(),
+})
+
+export type GameSearchPage = z.infer<typeof gameSearchPageSchema>
 
 export const gameSearchQuerySchema = z.object({
   q: z.string().max(200).default(''),

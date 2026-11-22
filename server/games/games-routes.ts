@@ -1,7 +1,7 @@
 import { gameSearchQuerySchema } from '@contracts/game'
 import { Hono } from 'hono'
-import { HTTPException } from 'hono/http-exception'
 import type { DependencyContainer } from 'tsyringe'
+import { ProblemError } from '../http/problem'
 import { parseQuery } from '../http/validation'
 import { GameCatalogService } from './game-catalog-service'
 
@@ -16,7 +16,10 @@ export function gamesRoutes(container: DependencyContainer) {
     })
     .get('/:pageId/details', async (c) => {
       const pageId = Number(c.req.param('pageId'))
-      if (!Number.isSafeInteger(pageId) || pageId <= 0) throw new HTTPException(400, { message: 'Invalid page id' })
+      if (!Number.isSafeInteger(pageId) || pageId <= 0) {
+        const detail = 'Must be a positive integer'
+        throw new ProblemError('validation-failed', { detail: `pageId: ${detail}`, errors: [{ parameter: 'pageId', detail }] })
+      }
       return c.json(await catalog().getDetails(pageId, c.req.query('qid')))
     })
 }

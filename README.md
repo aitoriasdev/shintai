@@ -50,6 +50,7 @@ The server only binds to `127.0.0.1`, so it is never reachable from other machin
 | `yarn lint`       | oxlint (incl. kebab-case file names, import cycles) + Steiger (FSD)    |
 | `yarn test`       | Vitest: component specs in real Chromium + server/contract specs in Node |
 | `yarn test:e2e`   | Playwright end-to-end flows plus axe WCAG 2.1 AA scans, against the built app and in-memory SQLite |
+| `yarn openapi`    | Regenerates `docs/api/openapi.json` from the Zod contracts (a test fails if it is out of date) |
 | `yarn check`      | All of the above                                                       |
 
 GitHub Actions runs the same four checks on every pull request (`.github/workflows/ci.yml`), and `main` accepts a pull request only when all of them pass.
@@ -79,6 +80,9 @@ src/         React UI, organized with Feature-Sliced Design
 | `DELETE /api/library/:gameId`         | Remove a game                             |
 | `GET /api/library/backup`             | Download a JSON backup                    |
 | `POST /api/library/backup`            | Merge a JSON backup                       |
+| `GET /api/openapi.json`               | This API as an OpenAPI 3.1 document       |
+
+Errors are [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) Problem Details (`application/problem+json`); each `type` links to its section in [docs/api/problems.md](docs/api/problems.md). The API reference is published with [Scalar](https://scalar.com) from `scalar.config.json`, `docs/api/` and the generated `docs/api/openapi.json`.
 
 ### UI (Feature-Sliced Design)
 
@@ -89,7 +93,7 @@ src/         React UI, organized with Feature-Sliced Design
 | `widgets/`  | `app-header`, `game-grid`, `game-details` (incl. score picker, library button) |
 | `features/` | `search-games`, `toggle-favorite`, `toggle-completed`                          |
 | `entities/` | `game` (API, card, cover), `library` (API, ordered optimistic mutations, badges) |
-| `shared/`   | API client, hooks, accessible UI primitives (dialog, skip link, live announcer, error toast), test helpers |
+| `shared/`   | API client (RFC 9457 errors), hooks, accessible UI primitives (dialog, skip link, live announcer, error toast), test helpers |
 
 Server state is handled by TanStack Query with optimistic updates; animations use Motion (`LazyMotion` + `domAnimation`); styling is Tailwind CSS v4; icons are Lucide.
 

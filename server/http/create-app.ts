@@ -9,9 +9,12 @@ import { GameNotFoundError } from '../games/game-catalog-service'
 import { gamesRoutes } from '../games/games-routes'
 import { UpstreamError } from '../games/wikipedia-client'
 import { libraryRoutes } from '../library/library-routes'
+import { createOpenApiDocument } from '../openapi/openapi-document'
+import { packageVersion } from '../openapi/package-version'
 import { LibraryRepository } from '../library/library-repository'
 import { TOKENS } from '../tokens'
 import { localOnly } from './local-only'
+import { blankProblem, ProblemError, problemResponse, typedProblem } from './problem'
 
 export function createApp(container: DependencyContainer) {
   const config = container.resolve<AppConfig>(TOKENS.Config)
@@ -19,6 +22,8 @@ export function createApp(container: DependencyContainer) {
 
   app.use('/api/*', localOnly())
   app.get('/api/health', (c) => c.json({ status: 'ok' }))
+  const openApiDocument = createOpenApiDocument(packageVersion())
+  app.get('/api/openapi.json', (c) => c.json(openApiDocument))
   app.route('/api/games', gamesRoutes(container))
   app.route('/api/library', libraryRoutes(container))
 
@@ -29,7 +34,7 @@ export function createApp(container: DependencyContainer) {
     })
   }
 
-  app.all('/api/*', (c) => c.json({ error: 'Not found' }, 404))
+  app.all('/api/*', (c) => problemResponse(c, blankProblem(404, c.req.path)))
 
   // Production: serve the built SPA (`yarn start`). In development Vite serves it instead.
   if (existsSync(config.staticRoot)) {
@@ -39,14 +44,18 @@ export function createApp(container: DependencyContainer) {
   }
 
   app.onError((error, c) => {
-    if (error instanceof HTTPException) return c.json({ error: error.message }, error.status)
-    if (error instanceof GameNotFoundError) return c.json({ error: error.message }, 404)
+    // Every error body is RFC 9457 Problem Details (application/problem+json).
+    const instance = c.req.path
+    if (error instanceof ProblemError) return problemResponse(c, typedProblem(error.slug, instance, { detail: error.detail, errors: error.errors }))
+    if (error instanceof GameNotFoundError) return problemResponse(c, typedProblem('game-not-found', instance, { detail: error.message }))
     if (error instanceof UpstreamError) {
+      // Upstream details go to the server log only.
       console.warn(`${error.message}${error.cause ? ` (${String((error.cause as Error).cause ?? error.cause)})` : ''}`)
-      return c.json({ error: 'Wikipedia is unavailable right now' }, 502)
+      return problemResponse(c, typedProblem('upstream-unavailable', instance))
     }
+    if (error instanceof HTTPException) return problemResponse(c, blankProblem(error.status, instance, error.message))
     console.error(error)
-    return c.json({ error: 'Internal server error' }, 500)
+    return problemResponse(c, blankProblem(500, instance))
   })
 
   return app

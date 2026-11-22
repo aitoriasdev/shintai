@@ -1,0 +1,34 @@
+{
+  "$schema": "https://registry.scalar.com/@scalar/schemas/config",
+  "scalar": "2.0.0",
+  "info": {
+    "title": "Shintai API",
+    "description": "The local API behind Shintai: the game catalogue, your library and its backups."
+  },
+  "navigation": {
+    "routes": {
+      "/": {
+        "type": "group",
+        "title": "Shintai API",
+        "children": {
+          "": {
+            "type": "page",
+            "title": "Introduction",
+            "filepath": "docs/api/introduction.md"
+          },
+          "/problems": {
+            "type": "page",
+            "title": "Problem types",
+            "filepath": "docs/api/problems.md"
+          },
+          "/reference": {
+            "type": "openapi",
+            "title": "API reference",
+            "url": "https://raw.githubusercontent.com/aitoriasdev/shintai/main/docs/api/openapi.json"
+          }
+        }
+      }
+    }
+  },
+  "publishOnMerge": true
+}

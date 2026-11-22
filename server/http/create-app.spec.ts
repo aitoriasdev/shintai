@@ -14,10 +14,11 @@ describe('createApp', () => {
     expect(await res.json()).toEqual({ status: 'ok' })
   })
 
-  it('responds 404 JSON for unknown API routes', async () => {
+  it('responds with an about:blank problem for unknown API routes', async () => {
     const res = await setup().request('/api/nope')
     expect(res.status).toBe(404)
-    expect(await res.json()).toEqual({ error: 'Not found' })
+    expect(res.headers.get('Content-Type')).toBe('application/problem+json')
+    expect(await res.json()).toEqual({ type: 'about:blank', status: 404, title: 'Not Found', instance: '/api/nope' })
   })
 
   it('only exposes the test reset route when enabled', async () => {

@@ -1,4 +1,5 @@
 import type { GameSummary } from '@contracts/game'
+import { PROBLEM_TYPE_BASE } from '@contracts/problem'
 import { describe, expect, it } from 'vitest'
 import { createApp } from '../http/create-app'
 import { createTestContainer } from '../testing/create-test-container'
@@ -30,15 +31,27 @@ describe('/api/library', () => {
     expect(await (await json('GET', '/api/library')).json()).toHaveLength(1)
 
     expect((await json('DELETE', '/api/library/Q1')).status).toBe(204)
-    expect((await json('DELETE', '/api/library/Q1')).status).toBe(404)
+    const gone = await json('DELETE', '/api/library/Q1')
+    expect(gone.status).toBe(404)
+    expect(await gone.json()).toMatchObject({ type: `${PROBLEM_TYPE_BASE}entry-not-found`, instance: '/api/library/Q1' })
   })
 
   it('rejects invalid bodies and mismatched ids', async () => {
     const { app, json } = setup()
-    expect((await json('PUT', '/api/library/Q1', { game, patch: { score: 42 } })).status).toBe(400)
-    expect((await json('PUT', '/api/library/Q2', { game })).status).toBe(400)
+    const invalid = await json('PUT', '/api/library/Q1', { game, patch: { score: 42 } })
+    expect(invalid.status).toBe(400)
+    expect(invalid.headers.get('Content-Type')).toBe('application/problem+json')
+    expect(await invalid.json()).toMatchObject({
+      type: `${PROBLEM_TYPE_BASE}validation-failed`,
+      errors: [{ pointer: '#/patch/score', detail: expect.any(String) }],
+    })
+
+    const mismatched = await json('PUT', '/api/library/Q2', { game })
+    expect(await mismatched.json()).toMatchObject({ status: 400, errors: [{ pointer: '#/game/id' }] })
+
     const malformed = await app.request('/api/library/Q1', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: '{nope' })
     expect(malformed.status).toBe(400)
+    expect(await malformed.json()).toMatchObject({ type: `${PROBLEM_TYPE_BASE}malformed-json` })
   })
 
   it('exports and imports backups', async () => {
@@ -70,12 +83,14 @@ describe('/api/library', () => {
       body: forged,
     })
     expect(noCors.status).toBe(415)
+    expect(await noCors.json()).toMatchObject({ type: `${PROBLEM_TYPE_BASE}unsupported-media-type` })
     const crossOrigin = await app.request('/api/library/backup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Origin: 'https://evil.example' },
       body: forged,
     })
     expect(crossOrigin.status).toBe(403)
+    expect(await crossOrigin.json()).toMatchObject({ type: `${PROBLEM_TYPE_BASE}cross-site-request` })
 
     expect(await (await json('GET', '/api/library')).json()).toMatchObject([{ score: 9 }])
   })

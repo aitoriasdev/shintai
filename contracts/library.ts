@@ -45,8 +45,11 @@ export const libraryBackupSchema = z.object({
 
 export type LibraryBackup = z.infer<typeof libraryBackupSchema>
 
-export interface ImportResult {
-  added: number
-  updated: number
-  skipped: number
-}
+/** Outcome of merging a backup: newer entries win, identical or older ones are skipped. */
+export const importResultSchema = z.object({
+  added: z.number().int().nonnegative(),
+  updated: z.number().int().nonnegative(),
+  skipped: z.number().int().nonnegative(),
+})
+
+export type ImportResult = z.infer<typeof importResultSchema>
