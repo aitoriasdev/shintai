@@ -1,5 +1,6 @@
 import { Search, X } from 'lucide-react'
 import { useCallback, useRef } from 'react'
+import { useI18n } from '@/shared/i18n/use-i18n'
 import { useHotkey } from '@/shared/lib/use-hotkey'
 
 interface SearchFieldProps {
@@ -11,6 +12,7 @@ interface SearchFieldProps {
 
 /** Search landmark. Press `/` anywhere to focus it, Escape to clear it. */
 export function SearchField({ value, onChange, label }: SearchFieldProps) {
+  const { t } = useI18n()
   const inputRef = useRef<HTMLInputElement>(null)
   useHotkey(
     '/',
@@ -46,7 +48,7 @@ export function SearchField({ value, onChange, label }: SearchFieldProps) {
             onChange('')
             inputRef.current?.focus()
           }}
-          aria-label="Clear search"
+          aria-label={t.header.clearSearch}
           className="absolute top-1/2 right-1.5 grid size-9 -translate-y-1/2 place-items-center rounded-full text-muted hover:text-text"
         >
           <X className="size-4" aria-hidden="true" />

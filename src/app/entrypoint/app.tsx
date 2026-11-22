@@ -4,6 +4,7 @@ import { useLibraryEntries } from '@/entities/library/api/library-queries'
 import { SearchField } from '@/features/search-games/ui/search-field'
 import { DiscoverPage } from '@/pages/discover/ui/discover-page'
 import { LibraryPage } from '@/pages/library/ui/library-page'
+import { useI18n } from '@/shared/i18n/use-i18n'
 import { useDebouncedValue } from '@/shared/lib/use-debounced-value'
 import { ErrorToast } from '@/shared/ui/error-toast'
 import { LiveAnnouncer } from '@/shared/ui/live-announcer'
@@ -15,6 +16,7 @@ import { useHashView } from '../routing/use-hash-view'
 const MAIN_ID = 'main'
 
 export function App() {
+  const { t } = useI18n()
   const [view, setView] = useHashView()
   const [search, setSearch] = useState({ discover: '', library: '' })
   const [selected, setSelected] = useState<GameSummary | null>(null)
@@ -45,7 +47,7 @@ export function App() {
             key={view}
             value={search[view]}
             onChange={(value) => setSearch((current) => ({ ...current, [view]: value }))}
-            label={view === 'discover' ? 'Search all games' : 'Search your library'}
+            label={view === 'discover' ? t.header.searchAll : t.header.searchLibrary}
           />
         }
       />

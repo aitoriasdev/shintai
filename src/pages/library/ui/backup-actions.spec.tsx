@@ -1,6 +1,6 @@
 import { afterEach, expect, it, vi } from 'vitest'
 import { fakeApi, renderWithProviders } from '@/shared/lib/testing/render-with-providers'
-import { makeEntry } from '@/shared/lib/testing/fixtures'
+import { makeEntry, problemResponse } from '@/shared/lib/testing/fixtures'
 import { BackupActions } from './backup-actions'
 
 afterEach(() => vi.restoreAllMocks())
@@ -45,4 +45,16 @@ it('rejects files that are not Shintai backups without calling the API', async (
 
   await expect.element(screen.getByRole('status')).toHaveTextContent('That file is not a Shintai backup.')
   expect(fetchMock.mock.calls.some(([, init]) => init?.method === 'POST')).toBe(false)
+})
+
+it('says nothing was imported when the API rejects the entries', async () => {
+  vi.spyOn(window, 'fetch').mockImplementation(
+    fakeApi(({ method }) => (method === 'POST' ? problemResponse('validation-failed', { detail: 'entries.0.score: Too big' }) : Response.json([]))),
+  )
+  const screen = await renderWithProviders(<BackupActions />)
+  const backup = { app: 'shintai', version: 1, exportedAt: 1, entries: [makeEntry({ score: 42 })] }
+
+  upload(screen.getByLabelText('Backup file').element() as HTMLInputElement, JSON.stringify(backup))
+
+  await expect.element(screen.getByRole('status')).toHaveTextContent('That backup has entries Shintai cannot read, so nothing was imported.')
 })

@@ -1,6 +1,7 @@
 import type { GameSummary } from '@contracts/game'
 import { CircleCheck } from 'lucide-react'
 import { useLibraryEntry, useUpsertEntry } from '@/entities/library/api/library-queries'
+import { useI18n } from '@/shared/i18n/use-i18n'
 import { IconButton } from '@/shared/ui/icon-button'
 
 interface CompletedButtonProps {
@@ -13,10 +14,11 @@ interface CompletedButtonProps {
 export function CompletedButton({ game, size = 'sm', showLabel = false }: CompletedButtonProps) {
   const completed = useLibraryEntry(game.id)?.completed ?? false
   const upsert = useUpsertEntry()
+  const { t } = useI18n()
 
   return (
     <IconButton
-      label="Completed"
+      label={t.game.completed}
       context={game.title}
       tone="completed"
       size={size}

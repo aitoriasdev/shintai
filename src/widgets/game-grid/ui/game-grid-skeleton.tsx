@@ -1,17 +1,19 @@
+import { useI18n } from '@/shared/i18n/use-i18n'
 import { GRID_CLASS } from './game-grid'
 
-export function GameGridSkeleton({ count = 12, label = 'Loading games' }: { count?: number; label?: string }) {
+const pulse = 'animate-pulse bg-surface-2 motion-reduce:animate-none'
+
+export function GameGridSkeleton({ count = 12, label }: { count?: number; label?: string }) {
+  const { t } = useI18n()
   return (
     <div role="status">
-      <span className="sr-only">{label}…</span>
+      <span className="sr-only">{label ?? t.discover.loading}…</span>
       <div className={GRID_CLASS} aria-hidden="true">
         {Array.from({ length: count }, (_, i) => (
-          <div key={i} className="overflow-hidden rounded-2xl border border-border bg-surface">
-            <div className="aspect-[3/4] animate-pulse bg-surface-2 motion-reduce:animate-none" />
-            <div className="space-y-2 p-3">
-              <div className="h-3.5 w-3/4 animate-pulse rounded bg-surface-2 motion-reduce:animate-none" />
-              <div className="h-3 w-1/2 animate-pulse rounded bg-surface-2 motion-reduce:animate-none" />
-            </div>
+          <div key={i}>
+            <div className={`aspect-[3/4] rounded-xl ${pulse}`} />
+            <div className={`mt-3 h-3.5 w-3/4 rounded ${pulse}`} />
+            <div className={`mt-2 h-3 w-1/3 rounded ${pulse}`} />
           </div>
         ))}
       </div>

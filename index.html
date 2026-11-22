@@ -1,13 +1,44 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en-GB" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="description" content="Your personal gaming journal: every game you played, your score, what you completed and your favourites." />
     <link rel="preconnect" href="https://en.wikipedia.org" />
     <link rel="preconnect" href="https://upload.wikimedia.org" />
     <title>Shintai</title>
+    <script>
+      // Applies the saved theme and language before the first paint (no flash of the wrong theme).
+      // Keep in sync with src/widgets/app-header/model/theme-store.ts and src/shared/i18n/i18n-store.ts.
+      ;(function () {
+        var theme = null
+        var locale = null
+        try {
+          theme = localStorage.getItem('shintai.theme')
+          locale = localStorage.getItem('shintai.locale')
+        } catch (error) {
+          console.warn('Could not read the saved theme and language; using the defaults.', error)
+        }
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+        }
+        if (locale !== 'en-GB' && locale !== 'es-ES') {
+          // Same rule as matchLocale(): the first English or Spanish entry in the browser's list wins.
+          locale = 'en-GB'
+          var preferred = navigator.languages || [navigator.language]
+          for (var i = 0; i < preferred.length; i++) {
+            var language = String(preferred[i]).toLowerCase().split('-')[0]
+            if (language === 'es') locale = 'es-ES'
+            if (language === 'es' || language === 'en') break
+          }
+        }
+        document.documentElement.dataset.theme = theme
+        document.documentElement.style.colorScheme = theme
+        document.documentElement.lang = locale
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

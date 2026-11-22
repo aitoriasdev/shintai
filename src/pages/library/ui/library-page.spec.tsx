@@ -18,7 +18,7 @@ it('lists entries with stats and filters them', async () => {
   await expect.element(screen.getByRole('heading', { name: 'Hades' })).toBeVisible()
   await expect.element(screen.getByText('10.0')).toBeVisible()
 
-  await screen.getByRole('radio', { name: 'Favorites' }).click()
+  await screen.getByRole('radio', { name: 'Favourites' }).click()
   await expect.element(screen.getByRole('heading', { name: 'Hades' })).not.toBeInTheDocument()
 })
 

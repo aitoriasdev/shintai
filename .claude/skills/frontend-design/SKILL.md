@@ -12,12 +12,12 @@ license: Apache-2.0 (https://www.apache.org/licenses/LICENSE-2.0)
 
 Shintai already has a visual identity, and it is the brief. Inside this app, the guidance below applies to how a new screen or component is composed, not to replacing the palette or type. A new direction (new colors, typefaces or layout system) needs the owner's go-ahead first.
 
-- **Tokens**: use the colors from `@theme` in `src/app/styles/index.css` through Tailwind utilities (`bg-surface`, `text-muted`, `border-control`, `text-favorite`, …). Never hard-code a hex value. A new token needs its contrast measured against `bg`, `surface` and `surface-2` and recorded in that file and in `docs/accessibility.md`: at least 4.5:1 for text and 3:1 for control boundaries and focus.
+- **Tokens**: use the colors from `@theme` in `src/app/styles/index.css` through Tailwind utilities (`bg-surface`, `text-muted`, `border-control`, `text-favorite`, `text-on-status`, …). Never hard-code a hex value or `text-black`/`text-white`. There are two themes: a new token needs a dark value (`@theme`) and a light one (`:root[data-theme='light']`), each with its contrast measured against `bg`, `surface` and `surface-2` and recorded in that file and in `docs/accessibility.md`: at least 4.5:1 for text and 3:1 for control boundaries and focus. Check new UI in both themes.
 - **Type**: the system UI font stack (`--font-sans`), so no web fonts.
 - **Motion**: Motion through `LazyMotion` with `domAnimation` (use `m.*` components, never `motion.*`), and `MotionConfig reducedMotion="user"`. CSS transitions get a `motion-reduce:` counterpart.
 - **Icons**: `lucide-react`, `aria-hidden="true"` when next to text.
 - **Quality floor**: WCAG 2.1 AA as described in `docs/accessibility.md`. Native controls first, `border-control` on interactive boundaries, targets of at least 36 px (44 px with `pointer-coarse:`), works down to 320 px wide, and visible focus (global `:focus-visible` outline). Every new page or dialog gets an `expectAccessible(page)` check.
-- **Copy**: follow the writing guidance at the end of this skill. Toggle names stay constant ("Favorite: Celeste") and expose state with `aria-pressed`.
+- **Copy**: every string goes in both catalogues in `src/shared/i18n/messages/` (British English and Spanish), and must still fit when it is longer in Spanish. Follow the writing guidance at the end of this skill. Toggle names stay constant ("Favourite: Celeste") and expose state with `aria-pressed`.
 
 Approach this as the design lead at a design studio known for giving every client a distinct visual identity that is not mistaken for anyone else's. This client has already rejected proposals that felt cliché or templated, and is paying for a distinctive point of view: make deliberate, opinionated choices about palette, typography, and layout that are specific to this brief, and take aesthetic risk if justified.
 

@@ -6,6 +6,9 @@ import { gameQueries } from '@/entities/game/api/game-queries'
 import { GameCover } from '@/entities/game/ui/game-cover'
 import { CompletedButton } from '@/features/toggle-completed/ui/completed-button'
 import { FavoriteButton } from '@/features/toggle-favorite/ui/favorite-button'
+import { describeError } from '@/shared/i18n/describe-error'
+import type { Messages } from '@/shared/i18n/messages/en-gb'
+import { useI18n } from '@/shared/i18n/use-i18n'
 import { cn } from '@/shared/lib/cn'
 import { Dialog } from '@/shared/ui/dialog'
 import { LibraryButton } from './library-button'
@@ -13,39 +16,43 @@ import { ScorePicker } from './score-picker'
 
 const TITLE_ID = 'game-details-title'
 
-function Facts({ details }: { details: GameDetails }) {
+/** Wikipedia and Wikidata text is English whatever the UI language (3.1.2 Language of Parts). */
+const WIKIPEDIA_LANG = 'en'
+
+function Facts({ details, t }: { details: GameDetails; t: Messages }) {
   const facts = [
-    ['Released', details.releaseDate ? [details.releaseDate] : []],
-    ['Platforms', details.platforms],
-    ['Genres', details.genres],
-    ['Developers', details.developers],
-    ['Publishers', details.publishers],
+    [t.details.released, details.releaseDate ? [details.releaseDate] : []],
+    [t.details.platforms, details.platforms],
+    [t.details.genres, details.genres],
+    [t.details.developers, details.developers],
+    [t.details.publishers, details.publishers],
   ] as const
   const visible = facts.filter(([, values]) => values.length > 0)
   if (visible.length === 0) return null
 
   return (
     <section>
-    <h3 className="sr-only">Facts</h3>
-    <dl className="grid gap-4 sm:grid-cols-2">
-      {visible.map(([term, values]) => (
-        <div key={term}>
-          <dt className="mb-1.5 text-xs font-semibold tracking-wider text-muted uppercase">{term}</dt>
-          <dd className="flex flex-wrap gap-1.5">
-            {values.map((value) => (
-              <span key={value} className="rounded-full bg-surface-2 px-2.5 py-1 text-xs text-text">
-                {value}
-              </span>
-            ))}
-          </dd>
-        </div>
-      ))}
-    </dl>
+      <h3 className="sr-only">{t.details.facts}</h3>
+      <dl className="grid gap-x-6 gap-y-4 border-t border-border pt-5 sm:grid-cols-2">
+        {visible.map(([term, values]) => (
+          <div key={term}>
+            <dt className="mb-1.5 text-sm font-medium text-muted">{term}</dt>
+            <dd lang={WIKIPEDIA_LANG} className="flex flex-wrap gap-1.5">
+              {values.map((value) => (
+                <span key={value} className="rounded-full bg-surface-2 px-2.5 py-1 text-xs text-text">
+                  {value}
+                </span>
+              ))}
+            </dd>
+          </div>
+        ))}
+      </dl>
     </section>
   )
 }
 
 function Body({ game }: { game: GameSummary }) {
+  const { t } = useI18n()
   const details = useQuery(gameQueries.details(game))
   const [expanded, setExpanded] = useState(false)
   const extractId = useId()
@@ -61,10 +68,14 @@ function Body({ game }: { game: GameSummary }) {
 
       <div className="min-w-0 space-y-6">
         <div className="space-y-1 pr-12">
-          <h2 id={TITLE_ID} className="text-2xl font-bold text-balance text-text sm:text-3xl">
+          <h2 id={TITLE_ID} className="text-2xl font-bold tracking-tight text-balance text-text sm:text-3xl">
             {game.title}
           </h2>
-          {game.description && <p className="text-sm text-muted">{game.description}</p>}
+          {game.description && (
+            <p lang={WIKIPEDIA_LANG} className="text-sm text-muted">
+              {game.description}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -77,7 +88,7 @@ function Body({ game }: { game: GameSummary }) {
 
         {details.isPending && (
           <div role="status" className="space-y-2">
-            <span className="sr-only">Loading details…</span>
+            <span className="sr-only">{t.details.loading}…</span>
             {[100, 95, 88, 60].map((width) => (
               <div key={width} aria-hidden="true" className="h-3.5 animate-pulse rounded bg-surface-2 motion-reduce:animate-none" style={{ width: `${width}%` }} />
             ))}
@@ -86,9 +97,9 @@ function Body({ game }: { game: GameSummary }) {
 
         {details.isError && (
           <p role="alert" className="text-sm text-danger">
-            Could not load details: {details.error.message}{' '}
-            <button type="button" className="font-medium underline" onClick={() => details.refetch()}>
-              Retry
+            {t.details.loadError(describeError(details.error, t))}{' '}
+            <button type="button" className="min-h-9 font-medium underline" onClick={() => details.refetch()}>
+              {t.details.retry}
             </button>
           </p>
         )}
@@ -97,8 +108,8 @@ function Body({ game }: { game: GameSummary }) {
           <>
             {details.data.extract && (
               <section className="space-y-2">
-                <h3 className="sr-only">About the game</h3>
-                <p id={extractId} className={cn('text-sm leading-relaxed whitespace-pre-line text-text', !expanded && 'line-clamp-6')}>
+                <h3 className="sr-only">{t.details.about}</h3>
+                <p id={extractId} lang={WIKIPEDIA_LANG} className={cn('text-sm leading-relaxed whitespace-pre-line text-text', !expanded && 'line-clamp-6')}>
                   {details.data.extract}
                 </p>
                 <button
@@ -108,19 +119,20 @@ function Body({ game }: { game: GameSummary }) {
                   className="min-h-9 text-sm font-medium text-accent hover:underline"
                   onClick={() => setExpanded((v) => !v)}
                 >
-                  {expanded ? 'Show less' : 'Show more'}
+                  {expanded ? t.details.showLess : t.details.showMore}
                 </button>
               </section>
             )}
-            <Facts details={details.data} />
+            <Facts details={details.data} t={t} />
             <a
               href={details.data.wikipediaUrl}
               target="_blank"
               rel="noreferrer"
+              hrefLang={WIKIPEDIA_LANG}
               className="inline-flex min-h-9 items-center gap-1.5 text-sm text-muted underline-offset-4 hover:text-text hover:underline"
             >
-              Read more on Wikipedia
-              <span className="sr-only"> (opens in a new tab)</span>
+              {t.details.readMore}
+              <span className="sr-only"> {t.details.newTab}</span>
               <ExternalLink className="size-3.5" aria-hidden="true" />
             </a>
           </>
@@ -137,6 +149,7 @@ interface GameDetailsDialogProps {
 
 export function GameDetailsDialog({ game, onClose }: GameDetailsDialogProps) {
   // Keep rendering the last game while the dialog animates out.
+  const { t } = useI18n()
   const [shown, setShown] = useState(game)
   if (game && game !== shown) setShown(game)
 
@@ -147,7 +160,7 @@ export function GameDetailsDialog({ game, onClose }: GameDetailsDialogProps) {
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.app.close}
             className="absolute top-4 right-4 z-10 grid size-11 place-items-center rounded-full bg-surface-2 text-text transition-colors hover:bg-border"
           >
             <X className="size-5" aria-hidden="true" />

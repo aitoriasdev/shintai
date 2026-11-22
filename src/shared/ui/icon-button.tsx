@@ -6,8 +6,8 @@ type Tone = 'neutral' | 'favorite' | 'completed' | 'accent'
 /** Pressed toggles switch to a solid fill: the state change does not rely on hue alone (1.4.1). */
 const pressedTone: Record<Tone, string> = {
   neutral: 'border-text bg-text text-bg',
-  favorite: 'border-favorite bg-favorite text-black',
-  completed: 'border-completed bg-completed text-black',
+  favorite: 'border-favorite bg-favorite text-on-status',
+  completed: 'border-completed bg-completed text-on-status',
   accent: 'border-accent bg-accent text-on-accent',
 }
 

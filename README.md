@@ -11,6 +11,7 @@ It runs **only on your machine**. Your library lives in a local SQLite file; not
 - **Your library**: per game, a **1–10 personal score**, a **completed** flag and a **favorite** flag. Any of them adds the game to your library automatically.
 - **Library tools**: stats (games, completion rate, favorites, average score), status filters, sorting, accent-insensitive search.
 - **Backups**: export your library as JSON and import it back (merge: newer entries win).
+- **Your language and theme**: British English or Spanish (Spain), and a system, light or dark theme. Both are in **Preferences** in the header and remembered on this computer.
 - **Accessible**: targets WCAG 2.1 AA. Fully keyboard operable (`/` focuses search, `Esc` closes dialogs and clears search, arrow keys in radio groups), screen-reader friendly, contrast-checked, responsive down to 320 px, and respects "reduce motion". See [docs/accessibility.md](docs/accessibility.md).
 
 ## Getting started
@@ -90,12 +91,12 @@ Errors are [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) Problem Details (`
 | ----------- | ------------------------------------------------------------------------------ |
 | `app/`      | entrypoint, providers, hash routing, global styles                             |
 | `pages/`    | `discover`, `library` (plus library-only filters, stats and backup actions)    |
-| `widgets/`  | `app-header`, `game-grid`, `game-details` (incl. score picker, library button) |
+| `widgets/`  | `app-header` (incl. preferences: theme and language), `game-grid`, `game-details` (incl. score picker, library button) |
 | `features/` | `search-games`, `toggle-favorite`, `toggle-completed`                          |
 | `entities/` | `game` (API, card, cover), `library` (API, ordered optimistic mutations, badges) |
-| `shared/`   | API client (RFC 9457 errors), hooks, accessible UI primitives (dialog, skip link, live announcer, error toast), test helpers |
+| `shared/`   | API client (RFC 9457 errors), `i18n` (typed en-GB/es-ES catalogues, `Intl` formatting), hooks, accessible UI primitives (dialog, skip link, live announcer, error toast), test helpers |
 
-Server state is handled by TanStack Query with optimistic updates; animations use Motion (`LazyMotion` + `domAnimation`); styling is Tailwind CSS v4; icons are Lucide.
+Translations are plain typed objects: `messages/en-gb.ts` is the source and `es-es.ts` must match its shape, so a missing string is a type error. Numbers and plurals use `Intl`. Server state is handled by TanStack Query with optimistic updates; animations use Motion (`LazyMotion` + `domAnimation`); styling is Tailwind CSS v4; icons are Lucide.
 
 ## Conventions
 

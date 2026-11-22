@@ -1,6 +1,8 @@
 import { Compass, Library } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { useI18n } from '@/shared/i18n/use-i18n'
 import { cn } from '@/shared/lib/cn'
+import { PreferencesMenu } from './preferences-menu'
 
 export type AppView = 'discover' | 'library'
 
@@ -13,11 +15,13 @@ interface AppHeaderProps {
 }
 
 const TABS = [
-  { view: 'discover', label: 'Discover', icon: Compass },
-  { view: 'library', label: 'My library', icon: Library },
+  { view: 'discover', icon: Compass },
+  { view: 'library', icon: Library },
 ] as const
 
 export function AppHeader({ view, onViewChange, libraryCount, search }: AppHeaderProps) {
+  const { t } = useI18n()
+
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-bg/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-6">
@@ -26,33 +30,36 @@ export function AppHeader({ view, onViewChange, libraryCount, search }: AppHeade
           <span className="text-lg font-bold tracking-tight text-text">Shintai</span>
         </a>
 
-        <nav aria-label="Main" className="order-3 flex w-full gap-1 sm:order-none sm:w-auto">
-          {TABS.map(({ view: tab, label, icon: Icon }) => (
+        <nav aria-label={t.header.nav} className="order-3 flex w-full gap-1 sm:order-none sm:w-auto">
+          {TABS.map(({ view: tab, icon: Icon }) => (
             <a
               key={tab}
               href={`#${tab}`}
               aria-current={view === tab ? 'page' : undefined}
               onClick={() => onViewChange(tab)}
               className={cn(
-                'flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors sm:flex-none pointer-coarse:py-3',
+                'flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors sm:flex-none pointer-coarse:py-3',
                 view === tab ? 'bg-surface-2 text-text' : 'text-muted hover:text-text',
               )}
             >
               <Icon className="size-4" aria-hidden="true" />
-              {label}
+              {tab === 'discover' ? t.header.discover : t.header.library}
               {tab === 'library' && libraryCount !== undefined && (
                 <>
                   <span aria-hidden="true" className="rounded-full bg-accent px-1.5 text-xs font-semibold text-on-accent tabular-nums">
-                    {libraryCount}
+                    {t.app.number(libraryCount)}
                   </span>
-                  <span className="sr-only">{` (${libraryCount} ${libraryCount === 1 ? 'game' : 'games'})`}</span>
+                  <span className="sr-only"> {t.header.libraryCount(libraryCount)}</span>
                 </>
               )}
             </a>
           ))}
         </nav>
 
-        <div className="ml-auto w-full max-w-md flex-1 sm:w-auto">{search}</div>
+        <div className="ml-auto flex min-w-0 flex-1 items-center gap-2 sm:max-w-md">
+          <div className="min-w-0 flex-1">{search}</div>
+          <PreferencesMenu />
+        </div>
       </div>
     </header>
   )

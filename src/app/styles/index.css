@@ -1,9 +1,10 @@
 @import 'tailwindcss';
 
 /*
- * Color tokens. Contrast ratios (WCAG 2.1 AA) were measured against bg / surface / surface-2:
- * text 16.7:1 · muted ≥ 6.0:1 · accent ≥ 5.6:1 (≥ 5.1:1 on its 20% tint) · on-accent (black) 7.2:1
- * control borders ≥ 3.2:1 (1.4.11 non-text contrast) · favorite/completed/score/danger text ≥ 4.9:1
+ * Color tokens, dark theme (the default). Contrast ratios (WCAG 2.1 AA) were measured against bg / surface / surface-2:
+ * text ≥ 14.0:1 · muted ≥ 6.0:1 · accent ≥ 5.6:1 (≥ 4.6:1 on its 20% tint) · on-accent (black) 7.2:1
+ * control borders ≥ 3.2:1 (1.4.11 non-text contrast) · favorite/completed/score/danger text ≥ 5.2:1
+ * on-status (black) on favorite/completed/score/danger ≥ 6.7:1
  */
 @theme {
   --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -23,6 +24,35 @@
   --color-completed: #2fd398;
   --color-score: #ffc247;
   --color-danger: #ff5f5f;
+  /* Text and icons on a solid favorite/completed/score/danger fill. */
+  --color-on-status: #000000;
+}
+
+/*
+ * Light theme: cool lavender paper and deep violet ink, the same hues as the dark theme.
+ * Measured against bg / surface / surface-2: text ≥ 14.9:1 · muted ≥ 5.8:1 · accent ≥ 5.6:1 (5.0:1 on its 20% tint)
+ * on-accent (white) 6.9:1 · control borders ≥ 3.7:1 · favorite/completed/score/danger text ≥ 4.7:1
+ * on-status (white) on favorite/completed/score/danger ≥ 5.7:1
+ *
+ * `data-theme` always holds the resolved theme ("system" is resolved by the theme store and the inline
+ * script in index.html), so these values live in one place.
+ */
+:root[data-theme='light'] {
+  --color-bg: #f5f4fa;
+  --color-surface: #ffffff;
+  --color-surface-2: #eae8f3;
+  --color-border: #d9d7e6;
+  --color-control: #77748f;
+  --color-text: #16151f;
+  --color-muted: #585670;
+
+  --color-accent: #5a3fd1;
+  --color-on-accent: #ffffff;
+  --color-favorite: #c0175a;
+  --color-completed: #0b7552;
+  --color-score: #875500;
+  --color-danger: #c22a2a;
+  --color-on-status: #ffffff;
 }
 
 @layer base {
@@ -31,9 +61,13 @@
     scrollbar-gutter: stable;
   }
 
+  html[data-theme='light'] {
+    color-scheme: light;
+  }
+
   body {
     @apply min-h-dvh bg-bg font-sans text-text antialiased;
-    background-image: radial-gradient(60rem 30rem at 10% -10%, rgb(157 132 255 / 0.12), transparent 70%);
+    background-image: radial-gradient(60rem 30rem at 10% -10%, color-mix(in oklab, var(--color-accent) 12%, transparent), transparent 70%);
     background-attachment: fixed;
   }
 
@@ -56,6 +90,26 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* The preferences popover sits under its button; without anchor positioning, under the header's right edge. */
+  .preferences-popover {
+    position: fixed;
+    inset: auto;
+    top: 4.5rem;
+    right: 1rem;
+    margin: 0;
+  }
+
+  @supports (position-anchor: --preferences) {
+    .preferences-popover {
+      position-anchor: --preferences;
+      top: anchor(bottom);
+      right: anchor(right);
+      margin-top: 0.5rem;
     }
   }
 }
