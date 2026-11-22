@@ -35,3 +35,9 @@ test('reflows without horizontal scrolling at 320px (1.4.10)', async ({ page }) 
   expect(overflow).toBeLessThanOrEqual(0)
   await expectAccessible(page)
 })
+
+test('serves robots.txt instead of the app shell, so crawlers are told to stay away', async ({ request }) => {
+  const res = await request.get('/robots.txt')
+  expect(res.ok()).toBe(true)
+  expect(await res.text()).toContain('Disallow: /')
+})
