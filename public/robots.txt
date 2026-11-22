@@ -1,0 +1,3 @@
+# Shintai is a private app that runs on your own computer: nothing here is for search engines.
+User-agent: *
+Disallow: /
