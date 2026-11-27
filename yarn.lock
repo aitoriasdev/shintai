@@ -304,12 +304,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hono/node-server@npm:^2.1.9":
-  version: 2.1.9
-  resolution: "@hono/node-server@npm:2.1.9"
+"@hono/node-server@npm:^2.1.11":
+  version: 2.1.11
+  resolution: "@hono/node-server@npm:2.1.11"
   peerDependencies:
     hono: ^4 || ^5.0.0-0
-  checksum: 10c0/ca21fa779701847202c93b9f3de8991e926793ff5b0ea002a786bfd4a73300a5aaa1e5a0562254197bba53aede244d1a9e904bcfaac120a1e928dabce646efc6
+  checksum: 10c0/a9c1f543eb2fefe071192114f1c5ba7deb40235a80524b4c4622c00cb862eefc3453af8e6609bdd18fd715ba594b2afb21b4c357edf238db014298b89922baf1
   languageName: node
   linkType: hard
 
@@ -869,25 +869,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tanstack/query-core@npm:5.108.1":
-  version: 5.108.1
-  resolution: "@tanstack/query-core@npm:5.108.1"
-  checksum: 10c0/f0ae485a157dbeb6ebb987c6ccce056a076216cf38ee903dcd36ac501540ef523bea4e943ffa30de2c2b978750a525b19c3af09978b32457ed17f908f05f918f
+"@tanstack/query-core@npm:5.108.4":
+  version: 5.108.4
+  resolution: "@tanstack/query-core@npm:5.108.4"
+  checksum: 10c0/3ea20c613e0800b82ccee872a3946b8030156003b8cc15a9c6615b6ce1bd49e4c77935585353f7409a2168c52fc2c02f2d0b619637e77d4f0028f270fb64f17e
   languageName: node
   linkType: hard
 
-"@tanstack/react-query@npm:^5.108.1":
-  version: 5.108.1
-  resolution: "@tanstack/react-query@npm:5.108.1"
+"@tanstack/react-query@npm:^5.108.4":
+  version: 5.108.4
+  resolution: "@tanstack/react-query@npm:5.108.4"
   dependencies:
-    "@tanstack/query-core": "npm:5.108.1"
+    "@tanstack/query-core": "npm:5.108.4"
   peerDependencies:
     "@types/react": ^18 || ^19
     react: ^18 || ^19
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10c0/f80d2c6f935f8958572b6e3e25a151f816afe02e722276ce9139821254deb6f5a1c5829d1f07d67ee081d0473d7d64a27c219c0ba36ab598869f202854d9207d
+  checksum: 10c0/63c2f6c4f99b0c023c26b4b851b25170c402d15001cb6d4c5821dd389a108ea7c1d7ffd91d8d833fde6d8ce011ef01a2dcd3f00a3b8a8870db4b933279a7756b
   languageName: node
   linkType: hard
 
@@ -1920,16 +1920,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lucide-react@npm:^1.76.0":
-  version: 1.76.0
-  resolution: "lucide-react@npm:1.76.0"
+"lucide-react@npm:^1.78.0":
+  version: 1.78.0
+  resolution: "lucide-react@npm:1.78.0"
   peerDependencies:
     "@types/react": "*"
     react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 10c0/73d734d1e256eebd7e3306f3411b0db25d9a7552982d2f2d449fbab1257f9637cb82053af5dfc4c8679c1676da8e4f5190f34e74770d29b6eef796f6104d45d0
+  checksum: 10c0/1bdff1fdfc09a2da9ba67eed9b6a0a8ef8112ab01a44a5d4e4347c40190910190f0f1ca12bdc4c4795527047b4c09e92941141e08063180a20e324bab55afc62
   languageName: node
   linkType: hard
 
@@ -2399,10 +2399,10 @@ __metadata:
   dependencies:
     "@axe-core/playwright": "npm:^4.14.0"
     "@feature-sliced/steiger-plugin": "npm:^0.8.2"
-    "@hono/node-server": "npm:^2.1.9"
+    "@hono/node-server": "npm:^2.1.11"
     "@playwright/test": "npm:^1.65.1"
     "@tailwindcss/vite": "npm:^4.3.5"
-    "@tanstack/react-query": "npm:^5.108.1"
+    "@tanstack/react-query": "npm:^5.108.4"
     "@types/node": "npm:^26.6.6"
     "@types/react": "npm:^19.3.0"
     "@types/react-dom": "npm:^19.3.0"
@@ -2410,7 +2410,7 @@ __metadata:
     "@vitest/browser-playwright": "npm:^5.1.1"
     concurrently: "npm:^10.0.7"
     hono: "npm:^4.13.19"
-    lucide-react: "npm:^1.76.0"
+    lucide-react: "npm:^1.78.0"
     motion: "npm:^14.14.0"
     oxlint: "npm:^1.94.0"
     playwright: "npm:^1.65.1"
