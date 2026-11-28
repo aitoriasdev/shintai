@@ -2,7 +2,7 @@ import type { GameDetails, GameSearchPage, GameSearchQuery } from '@contracts/ga
 import { inject, injectable } from 'tsyringe'
 import type { AppConfig } from '../config'
 import { TOKENS } from '../tokens'
-import { GameDetailsCache } from './game-details-cache'
+import type { DetailsCache } from './details-cache'
 import { WikipediaClient } from './wikipedia-client'
 import { isQid } from './wikipedia-mappers'
 
@@ -19,7 +19,7 @@ export class GameNotFoundError extends Error {
 export class GameCatalogService {
   constructor(
     @inject(WikipediaClient) private readonly wikipedia: WikipediaClient,
-    @inject(GameDetailsCache) private readonly cache: GameDetailsCache,
+    @inject(TOKENS.DetailsCache) private readonly cache: DetailsCache,
     @inject(TOKENS.Config) private readonly config: AppConfig,
   ) {}
 

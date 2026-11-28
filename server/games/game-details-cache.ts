@@ -3,10 +3,11 @@ import type { DatabaseSync } from 'node:sqlite'
 import { inject, injectable } from 'tsyringe'
 import { z } from 'zod'
 import { TOKENS, type Clock } from '../tokens'
+import type { DetailsCache } from './details-cache'
 
-/** SQLite-backed cache so game details are fetched from Wikimedia only once in a while. */
+/** SQLite-backed details cache (the local app), so game details are fetched from Wikimedia only once in a while. */
 @injectable()
-export class GameDetailsCache {
+export class GameDetailsCache implements DetailsCache {
   constructor(
     @inject(TOKENS.Database) private readonly db: DatabaseSync,
     @inject(TOKENS.Clock) private readonly clock: Clock,
