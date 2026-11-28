@@ -77,7 +77,7 @@ function Body({ game }: { game: GameSummary }) {
         title={game.title}
         src={details.data?.coverUrl ?? game.coverUrl}
         eager
-        className="mx-auto w-40 rounded-2xl shadow-xl shadow-black/40 sm:w-full"
+        className="mx-auto w-40 rounded-2xl sm:w-full"
       />
 
       <div className="min-w-0 space-y-6">
