@@ -20,11 +20,11 @@ export function SegmentedControl<T extends string>({ label, options, value, onCh
   return (
     <fieldset>
       <legend className="sr-only">{label}</legend>
-      <div className="inline-flex flex-wrap rounded-full border border-control bg-surface p-1">
+      <div className="inline-flex flex-wrap rounded-full border border-input bg-card p-1">
         {options.map((option) => (
           <label
             key={option.value}
-            className="relative cursor-pointer rounded-full px-3 py-1.5 text-sm font-medium text-muted transition-colors hover:text-text has-checked:bg-accent has-checked:text-on-accent has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent pointer-coarse:py-2.5"
+            className="relative cursor-pointer rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground has-checked:bg-primary has-checked:text-primary-foreground has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary pointer-coarse:py-2.5"
           >
             <input
               type="radio"

@@ -1,6 +1,6 @@
 import type { LibraryEntry } from '@contracts/library'
 import { useI18n } from '@/shared/i18n/use-i18n'
-import { cn } from '@/shared/lib/cn'
+import { cn } from 'cn'
 import { computeStats } from '../model/compute-stats'
 
 /**
@@ -10,11 +10,11 @@ import { computeStats } from '../model/compute-stats'
 function Stat({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone: string }) {
   return (
     <div className="flex flex-col-reverse">
-      <dt className="text-sm text-muted">{label}</dt>
-      <dd className="text-3xl font-bold tracking-tight text-text tabular-nums">
+      <dt className="text-sm text-muted-foreground">{label}</dt>
+      <dd className="text-3xl font-bold tracking-tight text-foreground tabular-nums">
         <span className={cn('mr-2 inline-block size-2 -translate-y-1.5 rounded-full', tone)} aria-hidden="true" />
         {value}
-        {hint && <span className="ml-2 text-sm font-medium tracking-normal text-muted">{hint}</span>}
+        {hint && <span className="ml-2 text-sm font-medium tracking-normal text-muted-foreground">{hint}</span>}
       </dd>
     </div>
   )
@@ -30,7 +30,7 @@ export function LibraryStats({ entries }: { entries: LibraryEntry[] }) {
         {t.library.stats}
       </h2>
       <dl className="flex flex-wrap gap-x-10 gap-y-4">
-        <Stat tone="bg-accent" label={t.library.statGames} value={t.app.number(stats.total)} />
+        <Stat tone="bg-primary" label={t.library.statGames} value={t.app.number(stats.total)} />
         <Stat
           tone="bg-completed"
           label={t.library.statCompleted}
@@ -45,7 +45,7 @@ export function LibraryStats({ entries }: { entries: LibraryEntry[] }) {
         />
       </dl>
       {/* Completion at a glance; the same figure is in the text above, so the bar is decorative. */}
-      <div aria-hidden="true" className="h-1.5 overflow-hidden rounded-full bg-surface-2">
+      <div aria-hidden="true" className="h-1.5 overflow-hidden rounded-full bg-muted">
         <div className="h-full rounded-full bg-completed transition-[width] duration-500" style={{ width: `${stats.completionRate}%` }} />
       </div>
     </section>

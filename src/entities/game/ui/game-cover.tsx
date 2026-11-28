@@ -1,7 +1,7 @@
 import { Gamepad2 } from 'lucide-react'
 import { useState } from 'react'
 import { useI18n } from '@/shared/i18n/use-i18n'
-import { cn } from '@/shared/lib/cn'
+import { cn } from 'cn'
 
 interface GameCoverProps {
   title: string
@@ -26,7 +26,7 @@ export function GameCover({ title, src, className, eager = false, decorative = f
   const showImage = src && status !== 'error'
 
   return (
-    <div className={cn('relative aspect-[3/4] overflow-hidden bg-surface-2', className)} aria-hidden={decorative || undefined}>
+    <div className={cn('relative aspect-[3/4] overflow-hidden bg-muted', className)} aria-hidden={decorative || undefined}>
       {showImage ? (
         <img
           src={src}
@@ -41,15 +41,15 @@ export function GameCover({ title, src, className, eager = false, decorative = f
         <div
           role={decorative ? undefined : 'img'}
           aria-label={decorative ? undefined : t.game.noCover(title)}
-          className="flex size-full flex-col justify-between border-t-4 border-accent p-4"
+          className="flex size-full flex-col justify-between border-t-4 border-primary p-4"
         >
-          <Gamepad2 className="size-6 text-accent" aria-hidden="true" />
-          <span className="line-clamp-4 text-lg leading-tight font-bold tracking-tight text-balance text-text" aria-hidden="true">
+          <Gamepad2 className="size-6 text-primary" aria-hidden="true" />
+          <span className="line-clamp-4 text-lg leading-tight font-bold tracking-tight text-balance text-foreground" aria-hidden="true">
             {title}
           </span>
         </div>
       )}
-      {showImage && status === 'loading' && <div className="absolute inset-0 animate-pulse bg-surface-2 motion-reduce:animate-none" aria-hidden="true" />}
+      {showImage && status === 'loading' && <div className="absolute inset-0 animate-pulse bg-muted motion-reduce:animate-none" aria-hidden="true" />}
     </div>
   )
 }

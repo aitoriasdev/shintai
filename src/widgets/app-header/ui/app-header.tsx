@@ -1,7 +1,8 @@
 import { Compass, Library } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useI18n } from '@/shared/i18n/use-i18n'
-import { cn } from '@/shared/lib/cn'
+import { Badge } from '@/shared/ui/badge'
+import { cn } from 'cn'
 import { PreferencesMenu } from './preferences-menu'
 
 export type AppView = 'discover' | 'library'
@@ -23,11 +24,11 @@ export function AppHeader({ view, onViewChange, libraryCount, search }: AppHeade
   const { t } = useI18n()
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-bg/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3 sm:px-6">
         <a href="#discover" className="flex items-center gap-2" onClick={() => onViewChange('discover')}>
           <img src="/favicon.svg" alt="" className="size-8" aria-hidden="true" />
-          <span className="text-lg font-bold tracking-tight text-text">Shintai</span>
+          <span className="text-lg font-bold tracking-tight text-foreground">Shintai</span>
         </a>
 
         <nav aria-label={t.header.nav} className="order-3 flex w-full gap-1 sm:order-none sm:w-auto">
@@ -39,16 +40,16 @@ export function AppHeader({ view, onViewChange, libraryCount, search }: AppHeade
               onClick={() => onViewChange(tab)}
               className={cn(
                 'flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors sm:flex-none pointer-coarse:py-3',
-                view === tab ? 'bg-surface-2 text-text' : 'text-muted hover:text-text',
+                view === tab ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground',
               )}
             >
               <Icon className="size-4" aria-hidden="true" />
               {tab === 'discover' ? t.header.discover : t.header.library}
               {tab === 'library' && libraryCount !== undefined && (
                 <>
-                  <span aria-hidden="true" className="rounded-full bg-accent px-1.5 text-xs font-semibold text-on-accent tabular-nums">
+                  <Badge aria-hidden="true" className="px-1.5 py-0 font-semibold tabular-nums">
                     {t.app.number(libraryCount)}
-                  </span>
+                  </Badge>
                   <span className="sr-only"> {t.header.libraryCount(libraryCount)}</span>
                 </>
               )}

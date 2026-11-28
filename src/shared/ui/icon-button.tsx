@@ -1,14 +1,14 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
-import { cn } from '@/shared/lib/cn'
+import { cn } from 'cn'
 
 type Tone = 'neutral' | 'favorite' | 'completed' | 'accent'
 
 /** Pressed toggles switch to a solid fill: the state change does not rely on hue alone (1.4.1). */
 const pressedTone: Record<Tone, string> = {
-  neutral: 'border-text bg-text text-bg',
+  neutral: 'border-foreground bg-foreground text-background',
   favorite: 'border-favorite bg-favorite text-on-status',
   completed: 'border-completed bg-completed text-on-status',
-  accent: 'border-accent bg-accent text-on-accent',
+  accent: 'border-primary bg-primary text-primary-foreground',
 }
 
 const sizes = {
@@ -57,7 +57,7 @@ export function IconButton({
         'disabled:pointer-events-none disabled:opacity-50',
         sizes[size],
         showLabel && 'px-4',
-        pressed ? pressedTone[tone] : 'border-control bg-bg/80 text-text backdrop-blur-md hover:bg-surface-2',
+        pressed ? pressedTone[tone] : 'border-input bg-background/80 text-foreground backdrop-blur-md hover:bg-muted',
         className,
       )}
       {...rest}
