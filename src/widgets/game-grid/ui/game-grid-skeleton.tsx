@@ -1,6 +1,6 @@
 import { useI18n } from '@/shared/i18n/use-i18n'
 import { Skeleton } from '@/shared/ui/skeleton'
-import { GRID_CLASS } from './game-grid'
+import { GRID_CLASS } from '../lib/grid-class'
 
 export function GameGridSkeleton({ count = 12, label }: { count?: number; label?: string }) {
   const { t } = useI18n()

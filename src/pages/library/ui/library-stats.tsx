@@ -1,24 +1,7 @@
 import type { LibraryEntry } from '@contracts/library'
 import { useI18n } from '@/shared/i18n/use-i18n'
-import { cn } from 'cn'
 import { computeStats } from '../model/compute-stats'
-
-/**
- * Each stat is a `<div>` that directly wraps one `<dt>`/`<dd>` pair, as valid `<dl>` content requires (1.3.1).
- * The figure is shown first, but the label still comes first in the DOM and for screen readers.
- */
-function Stat({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone: string }) {
-  return (
-    <div className="flex flex-col-reverse">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="text-3xl font-bold tracking-tight text-foreground tabular-nums">
-        <span className={cn('mr-2 inline-block size-2 -translate-y-1.5 rounded-full', tone)} aria-hidden="true" />
-        {value}
-        {hint && <span className="ml-2 text-sm font-medium tracking-normal text-muted-foreground">{hint}</span>}
-      </dd>
-    </div>
-  )
-}
+import { LibraryStat } from './library-stat'
 
 export function LibraryStats({ entries }: { entries: LibraryEntry[] }) {
   const { t } = useI18n()
@@ -30,15 +13,15 @@ export function LibraryStats({ entries }: { entries: LibraryEntry[] }) {
         {t.library.stats}
       </h2>
       <dl className="flex flex-wrap gap-x-10 gap-y-4">
-        <Stat tone="bg-primary" label={t.library.statGames} value={t.app.number(stats.total)} />
-        <Stat
+        <LibraryStat tone="bg-primary" label={t.library.statGames} value={t.app.number(stats.total)} />
+        <LibraryStat
           tone="bg-completed"
           label={t.library.statCompleted}
           value={t.app.number(stats.completed)}
           hint={t.library.completionRate(stats.completionRate)}
         />
-        <Stat tone="bg-favorite" label={t.library.statFavourites} value={t.app.number(stats.favorites)} />
-        <Stat
+        <LibraryStat tone="bg-favorite" label={t.library.statFavourites} value={t.app.number(stats.favorites)} />
+        <LibraryStat
           tone="bg-score"
           label={t.library.statAverage}
           value={stats.averageScore === null ? t.library.noScoreYet : t.library.averageScore(stats.averageScore)}

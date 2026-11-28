@@ -2,7 +2,8 @@ import type { LibraryEntry } from '@contracts/library'
 import { afterEach, expect, it, vi } from 'vitest'
 import { userEvent } from 'vitest/browser'
 import { makeEntry, makeGame } from '@/shared/lib/testing/fixtures'
-import { fakeApi, renderWithProviders } from '@/shared/lib/testing/render-with-providers'
+import { fakeApi } from '@/shared/lib/testing/fake-api'
+import { renderWithProviders } from '@/shared/lib/testing/render-with-providers'
 import { ScorePicker } from './score-picker'
 
 afterEach(() => vi.restoreAllMocks())

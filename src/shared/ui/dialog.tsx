@@ -1,14 +1,10 @@
 import { AnimatePresence, m } from 'motion/react'
 import { type ReactNode, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import { focusFallback } from '../lib/focus-fallback'
 
 /** Element that holds the rest of the app; made `inert` while a dialog is open. */
 const APP_ROOT_ID = 'root'
-
-/** Where focus goes on close when the opener no longer exists (e.g. its card was removed). */
-function focusFallback(): HTMLElement | null {
-  return document.querySelector<HTMLElement>('main[tabindex], main h1[tabindex]') ?? document.querySelector<HTMLElement>('main')
-}
 
 interface DialogProps {
   open: boolean

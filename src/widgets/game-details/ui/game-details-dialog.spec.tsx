@@ -1,7 +1,8 @@
 import type { GameDetails } from '@contracts/game'
 import { afterEach, expect, it, vi } from 'vitest'
 import { setLocale } from '@/shared/i18n/i18n-store'
-import { fakeApi, renderWithProviders } from '@/shared/lib/testing/render-with-providers'
+import { fakeApi } from '@/shared/lib/testing/fake-api'
+import { renderWithProviders } from '@/shared/lib/testing/render-with-providers'
 import { makeGame, problemResponse } from '@/shared/lib/testing/fixtures'
 import { GameDetailsDialog } from './game-details-dialog'
 

@@ -4,15 +4,9 @@ import { useId, useState } from 'react'
 import { useLibraryEntry, useUpsertEntry } from '@/entities/library/api/library-queries'
 import { useI18n } from '@/shared/i18n/use-i18n'
 import { cn } from 'cn'
+import { scoreColor } from '../lib/score-color'
 
 const SCORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const
-
-/** Score colors are paired with the number itself, so meaning never relies on color alone (1.4.1). */
-function scoreColor(score: number): string {
-  if (score >= 8) return 'bg-completed text-on-status'
-  if (score >= 5) return 'bg-score text-on-status'
-  return 'bg-destructive text-on-status'
-}
 
 /** Personal 1–10 score as a native radio group (arrow keys change it), plus an explicit clear button. */
 export function ScorePicker({ game }: { game: GameSummary }) {
