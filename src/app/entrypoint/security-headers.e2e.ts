@@ -31,7 +31,7 @@ test('the app works under its Content Security Policy and Trusted Types', async 
   await page.getByRole('combobox', { name: 'Language' }).selectOption('es-ES')
   await page.keyboard.press('Escape')
   const download = page.waitForEvent('download')
-  await page.getByRole('link', { name: /Exportar/ }).click()
+  await page.getByRole('button', { name: /Exportar/ }).click()
   await download
 
   expect(await page.evaluate(() => (window as unknown as { cspViolations: string[] }).cspViolations)).toEqual([])

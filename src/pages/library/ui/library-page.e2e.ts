@@ -48,7 +48,7 @@ test('keeps keyboard focus when a card leaves the filtered view (2.4.3)', async 
 
 test('exports and re-imports a backup', async ({ page }) => {
   const downloadPromise = page.waitForEvent('download')
-  await page.getByRole('link', { name: 'Export library backup' }).click()
+  await page.getByRole('button', { name: 'Export library backup' }).click()
   const download = await downloadPromise
   expect(download.suggestedFilename()).toMatch(/^shintai-backup-\d{4}-\d{2}-\d{2}\.json$/)
   const backupPath = await download.path()

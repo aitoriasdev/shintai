@@ -67,6 +67,7 @@ export const esES: Messages = {
   library: {
     title: 'Mi biblioteca',
     intro: 'Todos los juegos que has jugado, puntuado y adorado. Solo se guardan en este ordenador.',
+    introDemo: 'Todos los juegos que has jugado, puntuado y adorado. Esto es una demo: tu biblioteca solo se guarda en este navegador.',
     loading: 'Cargando tu biblioteca',
     loadError: 'No se pudo cargar tu biblioteca',
     emptyTitle: 'Tu biblioteca está vacía',

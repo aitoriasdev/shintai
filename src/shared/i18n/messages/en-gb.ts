@@ -71,6 +71,7 @@ export const enGB = {
   library: {
     title: 'My library',
     intro: 'Every game you have played, rated and loved. Saved on this computer only.',
+    introDemo: 'Every game you have played, rated and loved. This is a demo: your library is saved in this browser only.',
     loading: 'Loading your library',
     loadError: 'Could not load your library',
     emptyTitle: 'Your library is empty',

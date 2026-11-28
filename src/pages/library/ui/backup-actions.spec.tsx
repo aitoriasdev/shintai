@@ -12,9 +12,24 @@ function upload(input: HTMLInputElement, content: string) {
   input.dispatchEvent(new Event('change', { bubbles: true }))
 }
 
-it('links to the backup download', async () => {
+it('downloads the backup from the library as a dated JSON file', async () => {
+  const backup = { app: 'shintai', version: 1, exportedAt: Date.UTC(2026, 10, 28), entries: [makeEntry()] }
+  vi.spyOn(window, 'fetch').mockImplementation(fakeApi(({ url }) => Response.json(url.pathname === '/api/library/backup' ? backup : [])))
+  const saved: { name: string; blob: Blob }[] = []
+  vi.spyOn(URL, 'createObjectURL').mockImplementation((blob) => {
+    saved.push({ name: '', blob: blob as Blob })
+    return 'blob:backup'
+  })
+  vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {
+    saved[saved.length - 1].name = this.download
+  })
   const screen = await renderWithProviders(<BackupActions />)
-  await expect.element(screen.getByRole('link', { name: 'Export library backup' })).toHaveAttribute('href', '/api/library/backup')
+
+  await screen.getByRole('button', { name: 'Export library backup' }).click()
+
+  await expect.poll(() => saved.length).toBe(1)
+  expect(saved[0].name).toBe('shintai-backup-2026-11-28.json')
+  expect(JSON.parse(await saved[0].blob.text())).toEqual(backup)
 })
 
 it('imports a valid backup and reports the result', async () => {

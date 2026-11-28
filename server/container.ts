@@ -25,7 +25,7 @@ export function createContainer(config: AppConfig, overrides: { clock?: Clock; f
 
   container.registerSingleton(WikipediaClient)
   container.registerSingleton(CoverService)
-  container.registerSingleton(GameDetailsCache)
+  container.registerSingleton(TOKENS.DetailsCache, GameDetailsCache)
   container.registerSingleton(GameCatalogService)
   container.registerSingleton(LibraryRepository)
   container.registerSingleton(LibraryService)

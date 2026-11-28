@@ -1,10 +1,12 @@
 import type { CoverWidth } from '@contracts/cover'
+import { IS_DEMO } from '@/shared/config/deployment'
 
 /**
- * URL of a game's cover resized by the API (`GET /api/covers`): WebP, same-origin and only as large as the card needs,
- * instead of Wikimedia's unscaled original.
+ * URL of a game's cover, resized: WebP, same-origin and only as large as the card needs, instead of Wikimedia's unscaled
+ * original. The local API resizes it (`GET /api/covers`); the hosted demo uses Vercel's image optimisation.
  */
-export function coverSrc(coverUrl: string, width: CoverWidth): string {
+export function coverSrc(coverUrl: string, width: CoverWidth, demo = IS_DEMO): string {
+  if (demo) return `/_vercel/image?${new URLSearchParams({ url: coverUrl, w: String(width), q: '75' })}`
   return `/api/covers?${new URLSearchParams({ src: coverUrl, w: String(width) })}`
 }
 

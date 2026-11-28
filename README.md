@@ -101,6 +101,22 @@ Errors are [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) Problem Details (`
 
 Translations are plain typed objects: `messages/en-gb.ts` is the source and `es-es.ts` must match its shape, so a missing string is a type error. Numbers and plurals use `Intl`. Server state is handled by TanStack Query with optimistic updates; animations use Motion (`LazyMotion` + `domAnimation`); styling is Tailwind CSS v4 with [shadcn/ui](https://ui.shadcn.com) components in `src/shared/ui/` and a palette of traditional Japanese colours; icons are Lucide.
 
+## Hosted demo (Vercel)
+
+The repository also deploys as a public demo, so anyone can try Shintai without installing it. It differs from the local app in three ways:
+
+- **Library:** each visitor's library is saved in their own browser (`localStorage`), not on a server. Backups export and import as usual.
+- **API:** a Vercel function serves the read-only catalogue (`/api/games/*`, `/api/health`, `/api/openapi.json`). It has no library routes, so there is nothing to write and no localhost guard.
+- **Covers:** Vercel's image optimisation resizes them (`/_vercel/image`), instead of `GET /api/covers`.
+
+`yarn build:vercel` builds the app with `VITE_DEMO=true` and writes `.vercel/output` in the [Build Output API](https://vercel.com/docs/build-output-api/v3) format: the static app, the function bundled with esbuild (Vercel's own TypeScript build doesn't resolve path aliases), and the routes, security headers and image settings. `vercel.json` tells Vercel to run it.
+
+To deploy your own copy:
+
+1. In Vercel, **Add New → Project** and import the repository. `vercel.json` sets the framework, install and build commands, so leave those settings empty.
+2. Under **Environment Variables**, add `ENABLE_EXPERIMENTAL_COREPACK` = `1` (Production and Preview), so Vercel installs with the Yarn version in `packageManager`.
+3. Deploy. Every push to `main` deploys to production, and every pull request gets a preview URL.
+
 ## Conventions
 
 - **File names are always kebab-case** (enforced by `unicorn/filename-case`).
