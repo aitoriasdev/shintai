@@ -1,5 +1,6 @@
 import type { GameDetails, GameSearchPage } from '@contracts/game'
 import { inject, injectable } from 'tsyringe'
+import { WIKIMEDIA_USER_AGENT } from '../http/wikimedia-user-agent'
 import { TOKENS, type FetchFn } from '../tokens'
 import { parseFacts, sortByRank, toGameSummary, type SparqlRow, type WikiPage } from './wikipedia-mappers'
 
@@ -8,7 +9,6 @@ export const WIKIDATA_SPARQL = 'https://query.wikidata.org/sparql'
 export const SEARCH_PAGE_SIZE = 24
 
 /** Wikimedia asks API clients to identify themselves. */
-const USER_AGENT = 'Shintai/0.1 (local personal game library; https://github.com/aitoriasdev/shintai)'
 
 /** Only English Wikipedia articles that carry a video game infobox (~28k games). */
 const GAME_FILTER = 'hastemplate:"Infobox video game"'
@@ -71,7 +71,7 @@ export class WikipediaClient {
     let res: Response
     try {
       res = await this.fetchFn(url, {
-        headers: { 'User-Agent': USER_AGENT, Accept: 'application/json' },
+        headers: { 'User-Agent': WIKIMEDIA_USER_AGENT, Accept: 'application/json' },
         signal: AbortSignal.timeout(10_000),
       })
     } catch (cause) {

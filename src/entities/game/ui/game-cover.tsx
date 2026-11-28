@@ -1,6 +1,7 @@
 import { ImageOff } from 'lucide-react'
 import { useState } from 'react'
 import { useI18n } from '@/shared/i18n/use-i18n'
+import { coverSrc, coverSrcSet } from '../lib/cover-src'
 import { cn } from 'cn'
 
 interface GameCoverProps {
@@ -31,7 +32,8 @@ export function GameCover({ title, src, className, eager = false, priority = fal
     <div className={cn('relative aspect-[3/4] overflow-hidden bg-muted', className)} aria-hidden={decorative || undefined}>
       {showImage ? (
         <img
-          src={src}
+          src={coverSrc(src, 240)}
+          srcSet={coverSrcSet(src)}
           alt={decorative ? '' : t.game.coverAlt(title)}
           loading={eager || priority ? 'eager' : 'lazy'}
           fetchPriority={priority ? 'high' : undefined}

@@ -1,6 +1,7 @@
 import { container as rootContainer, type DependencyContainer } from 'tsyringe'
 import type { AppConfig } from './config'
 import { openDatabase } from './database/database'
+import { CoverService } from './covers/cover-service'
 import { GameCatalogService } from './games/game-catalog-service'
 import { GameDetailsCache } from './games/game-details-cache'
 import { WikipediaClient } from './games/wikipedia-client'
@@ -23,6 +24,7 @@ export function createContainer(config: AppConfig, overrides: { clock?: Clock; f
   container.register(TOKENS.Fetch, { useValue: overrides.fetch ?? globalThis.fetch.bind(globalThis) })
 
   container.registerSingleton(WikipediaClient)
+  container.registerSingleton(CoverService)
   container.registerSingleton(GameDetailsCache)
   container.registerSingleton(GameCatalogService)
   container.registerSingleton(LibraryRepository)

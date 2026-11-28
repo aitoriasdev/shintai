@@ -1,3 +1,4 @@
+import { COVER_HOSTS, coverQuerySchema } from '@contracts/cover'
 import { gameDetailsSchema, gameSearchPageSchema, gameSearchQuerySchema, gameSummarySchema } from '@contracts/game'
 import { entryPatchSchema, importResultSchema, libraryBackupSchema, libraryEntrySchema, upsertEntrySchema } from '@contracts/library'
 import { PROBLEM_CONTENT_TYPE, PROBLEM_TYPE_BASE, PROBLEM_TYPES, type ProblemSlug, problemFieldErrorSchema, problemSchema } from '@contracts/problem'
@@ -57,15 +58,10 @@ function problems(...slugs: ProblemSlug[]) {
 const GUARD_READ = ['forbidden-host'] as const
 const GUARD_WRITE = ['forbidden-host', 'cross-site-request', 'unsupported-media-type'] as const
 
-function searchParameters() {
-  const { properties = {}, required = [] } = z.toJSONSchema(gameSearchQuerySchema, { io: 'input' }) as {
+function queryParameters(schema: z.ZodType, descriptions: Record<string, string>) {
+  const { properties = {}, required = [] } = z.toJSONSchema(schema, { io: 'input' }) as {
     properties?: Record<string, JsonSchema>
     required?: string[]
-  }
-  const descriptions: Record<string, string> = {
-    q: 'Title to search for. Empty: the most notable games.',
-    year: 'Only games first released in this year.',
-    offset: 'Position of the first result, from `nextOffset` of the previous page.',
   }
   return Object.entries(properties).map(([name, schema]) => ({
     name,
@@ -98,6 +94,7 @@ export function createOpenApiDocument(version: string) {
     servers: [{ url: 'http://127.0.0.1:4321', description: 'Default local server (`SHINTAI_PORT`)' }],
     tags: [
       { name: 'Games', description: 'The catalogue, from English Wikipedia and Wikidata.' },
+      { name: 'Covers', description: 'Cover art from Wikimedia, resized and converted to WebP.' },
       { name: 'Library', description: 'Your games, scores and flags, stored in SQLite.' },
       { name: 'Meta', description: 'Health and this document.' },
     ],
@@ -127,9 +124,30 @@ export function createOpenApiDocument(version: string) {
           operationId: 'searchGames',
           summary: 'Search or browse the catalogue',
           description: 'Successful pages may be cached by the browser for an hour; errors never are.',
-          parameters: searchParameters(),
+          parameters: queryParameters(gameSearchQuerySchema, {
+            q: 'Title to search for. Empty: the most notable games.',
+            year: 'Only games first released in this year.',
+            offset: 'Position of the first result, from `nextOffset` of the previous page.',
+          }),
           responses: {
             '200': { description: 'One page of games.', content: json(ref('GameSearchPage')) },
+            ...problems('validation-failed', 'upstream-unavailable', ...GUARD_READ),
+          },
+        },
+      },
+      '/api/covers': {
+        get: {
+          tags: ['Covers'],
+          operationId: 'getCover',
+          summary: 'Get a cover, resized',
+          description:
+            'Fetches a game’s `coverUrl` from Wikimedia, shrinks it to the width (never enlarging it) and returns WebP. The response never changes for a URL, so it may be cached for a year.',
+          parameters: queryParameters(coverQuerySchema, {
+            src: `A game’s \`coverUrl\`. Only HTTPS URLs on ${COVER_HOSTS.join(' and ')} are accepted.`,
+            w: 'Width in pixels: a card or the dialog at 1x or 2x pixel density.',
+          }),
+          responses: {
+            '200': { description: 'The resized cover.', content: { 'image/webp': { schema: { type: 'string', format: 'binary' } } } },
             ...problems('validation-failed', 'upstream-unavailable', ...GUARD_READ),
           },
         },
