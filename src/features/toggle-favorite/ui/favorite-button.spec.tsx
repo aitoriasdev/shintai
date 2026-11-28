@@ -1,6 +1,7 @@
 import { afterEach, expect, it, vi } from 'vitest'
 import { makeEntry, makeGame } from '@/shared/lib/testing/fixtures'
-import { fakeApi, renderWithProviders } from '@/shared/lib/testing/render-with-providers'
+import { fakeApi } from '@/shared/lib/testing/fake-api'
+import { renderWithProviders } from '@/shared/lib/testing/render-with-providers'
 import { FavoriteButton } from './favorite-button'
 
 afterEach(() => vi.restoreAllMocks())

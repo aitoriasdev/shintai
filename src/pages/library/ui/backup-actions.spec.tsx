@@ -1,5 +1,6 @@
 import { afterEach, expect, it, vi } from 'vitest'
-import { fakeApi, renderWithProviders } from '@/shared/lib/testing/render-with-providers'
+import { fakeApi } from '@/shared/lib/testing/fake-api'
+import { renderWithProviders } from '@/shared/lib/testing/render-with-providers'
 import { makeEntry, problemResponse } from '@/shared/lib/testing/fixtures'
 import { BackupActions } from './backup-actions'
 

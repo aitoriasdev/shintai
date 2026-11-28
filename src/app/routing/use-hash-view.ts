@@ -1,5 +1,5 @@
 import { useCallback, useSyncExternalStore } from 'react'
-import type { AppView } from '@/widgets/app-header/ui/app-header'
+import type { AppView } from '@/widgets/app-header/model/app-view'
 
 function readView(): AppView {
   return window.location.hash === '#library' ? 'library' : 'discover'

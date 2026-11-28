@@ -3,9 +3,8 @@ import type { ReactNode } from 'react'
 import { useI18n } from '@/shared/i18n/use-i18n'
 import { Badge } from '@/shared/ui/badge'
 import { cn } from 'cn'
+import type { AppView } from '../model/app-view'
 import { PreferencesMenu } from './preferences-menu'
-
-export type AppView = 'discover' | 'library'
 
 interface AppHeaderProps {
   view: AppView
