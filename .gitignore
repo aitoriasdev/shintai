@@ -17,9 +17,7 @@ pnpm-debug.log*
 .env*.local
 *.local
 
-# editor / OS
-.vscode/*
-!.vscode/extensions.json
+# editor / OS (.vscode/ is committed: recommended extensions and workspace settings)
 .idea
 .DS_Store
 *.sw?
