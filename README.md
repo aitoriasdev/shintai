@@ -34,6 +34,8 @@ For development, with hot reload for both the UI and the API:
 yarn dev        # UI: http://localhost:5173 (proxies /api to the API on :4321)
 ```
 
+In VS Code, install the recommended extensions when prompted (`.vscode/extensions.json`): Oxc (oxlint fixes on save), Tailwind CSS IntelliSense (also inside `cn(…)`), Vitest, Playwright, EditorConfig and GitHub Actions. `.vscode/settings.json` uses the project's TypeScript and keeps build output out of search. Other editors pick up the whitespace rules from `.editorconfig`.
+
 ### Configuration
 
 | Variable          | Default            | Purpose                       |
