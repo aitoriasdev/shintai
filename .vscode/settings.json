@@ -1,0 +1,33 @@
+{
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "files.watcherExclude": {
+    "**/.vercel/**": true,
+    "**/coverage/**": true,
+    "**/data/**": true,
+    "**/dist/**": true,
+    "**/playwright-report/**": true,
+    "**/test-results/**": true
+  },
+  "search.exclude": {
+    ".vercel": true,
+    ".yarn": true,
+    "coverage": true,
+    "data": true,
+    "dist": true,
+    "docs/api/openapi.json": true,
+    "playwright-report": true,
+    "test-results": true,
+    "yarn.lock": true
+  },
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.oxc": "explicit"
+  },
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  "tailwindCSS.classFunctions": ["cn"]
+}
