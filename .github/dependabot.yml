@@ -51,7 +51,6 @@ updates:
           - 'hono'
           - '@hono/*'
           - 'tsyringe'
-          - 'reflect-metadata'
           - 'zod'
           - 'tsx'
       minor-and-patch:

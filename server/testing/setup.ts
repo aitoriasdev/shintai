@@ -1,2 +1,2 @@
-// tsyringe needs the Reflect metadata polyfill loaded before any decorated class.
-import 'reflect-metadata'
+// tsyringe needs the Reflect metadata functions loaded before any decorated class.
+import '../reflect-metadata'
