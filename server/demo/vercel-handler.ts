@@ -1,5 +1,5 @@
 // Entry point of the Vercel function (bundled by scripts/build-vercel-output.ts). tsyringe needs Reflect metadata first.
-import 'reflect-metadata'
+import '../reflect-metadata'
 import { getRequestListener } from '@hono/node-server'
 import { createDemoApp } from './create-demo-app'
 import { createDemoContainer } from './create-demo-container'

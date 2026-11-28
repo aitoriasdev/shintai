@@ -34,6 +34,7 @@ Never skip a failing check, never commit with `--no-verify`, and never relax a l
 ### File names and imports
 
 - **Every file name is kebab-case** (`game-card.tsx`, `use-in-view.ts`). Never camelCase or PascalCase. oxlint enforces this (`unicorn/filename-case`).
+- **One component per component file.** A `.tsx` file holds its component and nothing else. Hooks, helpers, constants shared with other files and lazy-loading definitions go in their own kebab-case files (`use-when-idle.ts`, `focus-heading.ts`, `query-client.ts`) and are imported; each gets its own colocated spec. Keep functions small and single-purpose (SOLID, KISS).
 - **No barrel files.** Never create an `index.ts` (or any file) that re-exports other modules. Import from the file that defines the value (`@/entities/game/ui/game-card`).
 - **Types live with the code that owns them.** There is no global `types.ts`.
 

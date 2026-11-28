@@ -1,4 +1,4 @@
-import 'reflect-metadata'
+import './reflect-metadata'
 import { serve } from '@hono/node-server'
 import type { DatabaseSync } from 'node:sqlite'
 import { loadConfig } from './config'
