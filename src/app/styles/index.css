@@ -1,58 +1,65 @@
 @import 'tailwindcss';
 
 /*
- * Color tokens, dark theme (the default). Contrast ratios (WCAG 2.1 AA) were measured against bg / surface / surface-2:
- * text ≥ 14.0:1 · muted ≥ 6.0:1 · accent ≥ 5.6:1 (≥ 4.6:1 on its 20% tint) · on-accent (black) 7.2:1
- * control borders ≥ 3.2:1 (1.4.11 non-text contrast) · favorite/completed/score/danger text ≥ 5.2:1
- * on-status (black) on favorite/completed/score/danger ≥ 6.7:1
+ * Color tokens: soft traditional colours of Japan (https://en.wikipedia.org/wiki/Traditional_colors_of_Japan).
+ * Dark theme (the default), "indigo night": kachi-iro 褐色 night, aijiro 藍白 text and pastel accents.
+ * Surfaces and borders are kachi-iro lifted with 5 / 10 / 18 % aijiro.
+ *
+ * Contrast (WCAG 2.1 AA), measured against bg / surface / surface-2:
+ * text ≥ 11.8:1 · muted ≥ 7.3:1 · accent ≥ 5.2:1 (4.6:1 on its 15% tint) · on-accent 6.9:1
+ * favorite ≥ 5.7:1 · completed ≥ 6.2:1 · score ≥ 7.6:1 · danger ≥ 5.0:1 · control borders ≥ 3.1:1 (1.4.11)
+ * on-status (kachi-iro) on favorite / completed / score / danger ≥ 6.6:1
  */
 @theme {
   --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
-  --color-bg: #0b0b12;
-  --color-surface: #14141f;
-  --color-surface-2: #1e1e2d;
+  --color-bg: #181b26; /* kachi-iro 褐色 */
+  --color-surface: #232630;
+  --color-surface-2: #2d313b;
   /* Decorative separators only. Interactive boundaries use --color-control. */
-  --color-border: #2b2b3f;
-  --color-control: #6b6b8a;
-  --color-text: #ececf4;
-  --color-muted: #9b9bb2;
+  --color-border: #3e424c;
+  --color-control: #757d75; /* minatonezumi 湊鼠 */
+  --color-text: #ebf6f7; /* aijiro 藍白 */
+  --color-muted: #c6c2b6; /* kamenozoki 瓶覗 */
 
-  --color-accent: #9d84ff;
-  --color-on-accent: #000000;
-  --color-favorite: #ff4f81;
-  --color-completed: #2fd398;
-  --color-score: #ffc247;
-  --color-danger: #ff5f5f;
+  --color-accent: #86aba5; /* mizu-iro 水色 */
+  --color-on-accent: #181b26;
+  --color-favorite: #f58f84; /* tokiha-iro 鴇羽色 */
+  --color-completed: #a5ba93; /* byakuroku 白緑 */
+  --color-score: #ffb95a; /* kuchinashi 梔子 */
+  --color-danger: #fa7b62; /* akebono-iro 曙色 */
   /* Text and icons on a solid favorite/completed/score/danger fill. */
-  --color-on-status: #000000;
+  --color-on-status: #181b26;
 }
 
 /*
- * Light theme: cool lavender paper and deep violet ink, the same hues as the dark theme.
- * Measured against bg / surface / surface-2: text ≥ 14.9:1 · muted ≥ 5.8:1 · accent ≥ 5.6:1 (5.0:1 on its 20% tint)
- * on-accent (white) 6.9:1 · control borders ≥ 3.7:1 · favorite/completed/score/danger text ≥ 4.7:1
- * on-status (white) on favorite/completed/score/danger ≥ 5.7:1
+ * Light theme, "washi paper": torinoko 鳥の子 paper (5 / 18 / 30 % on white, borders 55 %) and sumi-iro 墨色 ink.
+ * Pastels can't reach 4.5:1 as text on paper, so text and icons use the deeper traditional tone of each hue;
+ * four of them are deepened slightly toward a neighbouring ink (noted below) to pass on surface-2.
+ *
+ * Measured against bg / surface / surface-2: text ≥ 13.5:1 · muted ≥ 5.2:1 · accent ≥ 4.9:1 (4.6:1 on its 15% tint)
+ * on-accent 5.6:1 · favorite ≥ 6.4:1 · completed ≥ 4.8:1 · score ≥ 4.9:1 · danger ≥ 4.7:1 · control borders ≥ 3.2:1
+ * on-status (paper) on favorite / completed / score / danger ≥ 5.4:1
  *
  * `data-theme` always holds the resolved theme ("system" is resolved by the theme store and the inline
  * script in index.html), so these values live in one place.
  */
 :root[data-theme='light'] {
-  --color-bg: #f5f4fa;
-  --color-surface: #ffffff;
-  --color-surface-2: #eae8f3;
-  --color-border: #d9d7e6;
-  --color-control: #77748f;
-  --color-text: #16151f;
-  --color-muted: #585670;
+  --color-bg: #faf3ee;
+  --color-surface: #fefcfa;
+  --color-surface-2: #f6ece2;
+  --color-border: #efdbca;
+  --color-control: #918076; /* ginnezumi 銀鼠, 15 % toward sunezumi 素鼠 */
+  --color-text: #27221f; /* sumi-iro 墨色 */
+  --color-muted: #6e5f57; /* sunezumi 素鼠 */
 
-  --color-accent: #5a3fd1;
-  --color-on-accent: #ffffff;
-  --color-favorite: #c0175a;
-  --color-completed: #0b7552;
-  --color-score: #875500;
-  --color-danger: #c22a2a;
-  --color-on-status: #ffffff;
+  --color-accent: #2f6e7f; /* chigusa-iro 千草色, 15 % toward ai-iro 藍色 */
+  --color-on-accent: #fefcfa;
+  --color-favorite: #9d2933; /* enji-iro 臙脂色 */
+  --color-completed: #3f734e; /* rokushō 緑青, 25 % toward tokusa-iro 木賊色 */
+  --color-score: #985629; /* kitsune-iro 狐色 */
+  --color-danger: #be3a28; /* ake 緋, 20 % toward kokiake 深緋 */
+  --color-on-status: #fefcfa;
 }
 
 @layer base {

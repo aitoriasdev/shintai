@@ -28,7 +28,7 @@ it('resolves "system" to the operating system’s colour scheme', () => {
 
 it('switches the colour tokens with the theme', () => {
   setThemePreference('light')
-  expect(getComputedStyle(document.body).backgroundColor).toBe('rgb(245, 244, 250)')
+  expect(getComputedStyle(document.body).backgroundColor).toBe('rgb(250, 243, 238)')
   setThemePreference('dark')
-  expect(getComputedStyle(document.body).backgroundColor).toBe('rgb(11, 11, 18)')
+  expect(getComputedStyle(document.body).backgroundColor).toBe('rgb(24, 27, 38)')
 })
