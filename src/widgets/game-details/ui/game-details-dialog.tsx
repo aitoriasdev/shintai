@@ -72,15 +72,17 @@ function Body({ game }: { game: GameSummary }) {
   const extractId = useId()
 
   return (
-    <div className="grid gap-6 p-5 sm:grid-cols-[14rem_1fr] sm:p-8">
+    // From `sm` up the cover stays in place and only the information column scrolls; on phones the cover sits
+    // above the text and the whole panel scrolls, so the cover doesn't take a third of a small screen.
+    <div className="grid gap-6 p-5 sm:flex sm:max-h-[calc(92dvh-2px)] sm:gap-0 sm:p-0">
       <GameCover
         title={game.title}
         src={details.data?.coverUrl ?? game.coverUrl}
         eager
-        className="mx-auto w-40 rounded-2xl sm:w-full"
+        className="mx-auto w-40 rounded-2xl sm:m-8 sm:mr-0 sm:w-56 sm:shrink-0 sm:self-start"
       />
 
-      <div className="min-w-0 space-y-6">
+      <div className="min-w-0 space-y-6 sm:flex-1 sm:overflow-y-auto sm:overscroll-contain sm:p-8 sm:pl-6">
         <div className="space-y-1 pr-12">
           <h2 id={TITLE_ID} className="text-2xl font-bold tracking-tight text-balance text-foreground sm:text-3xl">
             {game.title}
