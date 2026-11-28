@@ -10,6 +10,14 @@ it('describes the cover art, or its absence', async () => {
   await expect.element(fallback.getByRole('img', { name: 'Hades (no cover art available)' })).toBeVisible()
 })
 
+it('shows a "no image" icon instead of repeating the title when there is no cover', async () => {
+  const screen = await render(<GameCover title="Hades" src={null} />)
+  const fallback = screen.getByRole('img', { name: 'Hades (no cover art available)' })
+  await expect.element(fallback).toBeVisible()
+  expect(fallback.element().textContent).toBe('')
+  expect(fallback.element().querySelector('svg.lucide-image-off')).not.toBeNull()
+})
+
 it('loads a priority cover eagerly and before other images (it is likely the LCP image)', async () => {
   const src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
   const priority = await render(<GameCover title="Celeste" src={src} priority />)

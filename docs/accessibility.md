@@ -15,36 +15,37 @@ Automated tools catch only part of all issues. Before a release, also do a manua
 
 ## Color contrast
 
-Both themes are measured. The tokens and their ratios are also recorded in `src/app/styles/index.css`.
+Both themes are measured. The tokens and their ratios are also recorded in `src/app/styles/index.css`. The palette uses [traditional colours of Japan](https://en.wikipedia.org/wiki/Traditional_colors_of_Japan): pastels on an indigo night in the dark theme, and the deeper tone of each hue on washi paper in the light theme, because pastels can't reach 4.5:1 as text on a light background.
 
-### Dark theme
-
-| Pair | Ratio | Required |
-| --- | --- | --- |
-| Text `#ececf4` on background `#0b0b12` | 16.7:1 | 4.5:1 |
-| Muted text `#9b9bb2` on surfaces | ≥ 6.0:1 | 4.5:1 |
-| Accent `#9d84ff` on background / surface | 6.7:1 / 6.2:1 | 4.5:1 |
-| Accent on its 20 % tint | 5.1:1 | 4.5:1 |
-| Black on accent (selected pills, count badge) | 7.2:1 | 4.5:1 |
-| Black on favorite / completed / score / danger | ≥ 6.5:1 | 4.5:1 |
-| Control borders `#6b6b8a` on surfaces | ≥ 3.2:1 | 3:1 (1.4.11) |
-| Focus outline (accent) on background | 6.7:1 | 3:1 (1.4.11) |
-
-### Light theme
+### Dark theme ("indigo night")
 
 | Pair | Ratio | Required |
 | --- | --- | --- |
-| Text `#16151f` on background `#f5f4fa` / surface `#ffffff` / surface-2 `#eae8f3` | 16.5:1 / 18.1:1 / 14.9:1 | 4.5:1 |
-| Muted text `#585670` on surfaces | ≥ 5.8:1 | 4.5:1 |
-| Accent `#5a3fd1` on surfaces | ≥ 5.6:1 | 4.5:1 |
-| Accent on its 20 % tint | 5.0:1 | 4.5:1 |
-| White on accent (selected pills, count badge) | 6.9:1 | 4.5:1 |
-| Favorite `#c0175a` / completed `#0b7552` / score `#875500` / danger `#c22a2a` text on surfaces | ≥ 4.7:1 | 4.5:1 |
-| White on favorite / completed / score / danger (`on-status`) | ≥ 5.7:1 | 4.5:1 |
-| Control borders `#77748f` on surfaces | ≥ 3.7:1 | 3:1 (1.4.11) |
-| Focus outline (accent) on background | 6.3:1 | 3:1 (1.4.11) |
+| Text aijiro `#ebf6f7` on background kachi-iro `#181b26` / card `#232630` / muted `#2d313b` | 15.6:1 / 13.7:1 / 11.8:1 | 4.5:1 |
+| Muted text kamenozoki `#c6c2b6` on surfaces | ≥ 7.3:1 | 4.5:1 |
+| Accent mizu-iro `#86aba5` on surfaces | ≥ 5.2:1 | 4.5:1 |
+| Accent on its 15 % tint | 4.6:1 | 4.5:1 |
+| Kachi-iro on accent (selected pills, count badge) | 6.9:1 | 4.5:1 |
+| Favorite tokiha-iro `#f58f84` / completed byakuroku `#a5ba93` / score kuchinashi `#ffb95a` / danger akebono-iro `#fa7b62` text on surfaces | ≥ 5.0:1 | 4.5:1 |
+| Kachi-iro on favorite / completed / score / danger (`on-status`) | ≥ 6.6:1 | 4.5:1 |
+| Control borders minatonezumi `#757d75` on surfaces | ≥ 3.1:1 | 3:1 (1.4.11) |
+| Focus outline (accent) on background | 6.9:1 | 3:1 (1.4.11) |
 
-Text on solid status fills uses the `on-status` token (black in the dark theme, white in the light one), never a fixed colour.
+### Light theme ("washi paper")
+
+| Pair | Ratio | Required |
+| --- | --- | --- |
+| Text sumi-iro `#27221f` on background `#faf3ee` / card `#fefcfa` / muted `#f6ece2` (torinoko tints) | 14.3:1 / 15.4:1 / 13.5:1 | 4.5:1 |
+| Muted text sunezumi `#6e5f57` on surfaces | ≥ 5.2:1 | 4.5:1 |
+| Accent `#2f6e7f` (chigusa-iro, deepened toward ai-iro) on surfaces | ≥ 4.9:1 | 4.5:1 |
+| Accent on its 15 % tint | 4.6:1 | 4.5:1 |
+| Paper on accent (selected pills, count badge) | 5.6:1 | 4.5:1 |
+| Favorite enji-iro `#9d2933` / completed `#3f734e` (rokushō) / score kitsune-iro `#985629` / danger `#be3a28` (ake) text on surfaces | ≥ 4.7:1 | 4.5:1 |
+| Paper on favorite / completed / score / danger (`on-status`) | ≥ 5.4:1 | 4.5:1 |
+| Control borders `#918076` (ginnezumi) on surfaces | ≥ 3.2:1 | 3:1 (1.4.11) |
+| Focus outline (accent) on background | 5.2:1 | 3:1 (1.4.11) |
+
+Text on solid status fills uses the `on-status` token (kachi-iro in the dark theme, paper in the light one), never a fixed colour.
 
 ## Audit (November 2026)
 
@@ -84,7 +85,8 @@ A code review of the full PR stack found three more accessibility issues. All ar
 
 - Prefer native elements: `<button>`, `<a>`, `<select>`, radio inputs in a `fieldset`. Reach for ARIA only when no native element fits.
 - Toggles keep a constant name and expose state with `aria-pressed`. Name per-item controls with their context (`IconButton`'s `context` prop).
-- Interactive boundaries use `border-control`; never encode state in hue alone.
+- Interactive boundaries use `border-input`; never encode state in hue alone.
+- shadcn/ui components draw focus with `ring-ring` at full strength (≥ 3:1). Never use a faded ring such as `ring-ring/50`, and use `text-on-status`, not `text-white`, on status fills.
 - Interactive controls are at least 36 px (44 px on touch screens through `pointer-coarse:`). This exceeds WCAG 2.2's 24 px minimum (2.5.8) and meets the 44 px AAA target on touch.
 - Announce asynchronous results with `announce()`. Report failures with `showError()`. Global live regions must live outside the app root, which dialogs make inert.
 - When an interaction can remove the focused element, move focus somewhere sensible (see `useFocusRecovery` in the game grid).

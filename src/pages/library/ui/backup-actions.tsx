@@ -8,9 +8,10 @@ import { ApiError } from '@/shared/api/api-client'
 import { describeError } from '@/shared/i18n/describe-error'
 import type { Messages } from '@/shared/i18n/messages/en-gb'
 import { useI18n } from '@/shared/i18n/use-i18n'
+import { Button } from '@/shared/ui/button'
 
-const actionClass =
-  'inline-flex h-9 items-center gap-2 rounded-full border border-control bg-surface px-3 text-sm text-text transition-colors hover:bg-surface-2 disabled:opacity-50 pointer-coarse:h-11'
+// Pill-shaped outline buttons, 36px tall (44px on touch screens, 2.5.5).
+const actionClass = 'rounded-full pointer-coarse:h-11'
 
 /** A problem with the chosen file itself, already worded for the user. */
 class BackupFileError extends Error {}
@@ -50,16 +51,18 @@ export function BackupActions() {
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <a href={LIBRARY_BACKUP_URL} download className={actionClass}>
-        <Download className="size-4" aria-hidden="true" />
-        {t.backup.export}
-        <span className="sr-only"> {t.backup.target}</span>
-      </a>
-      <button type="button" className={actionClass} onClick={() => inputRef.current?.click()} disabled={restore.isPending}>
-        <Upload className="size-4" aria-hidden="true" />
+      <Button asChild variant="outline" className={actionClass}>
+        <a href={LIBRARY_BACKUP_URL} download>
+          <Download aria-hidden="true" />
+          {t.backup.export}
+          <span className="sr-only"> {t.backup.target}</span>
+        </a>
+      </Button>
+      <Button variant="outline" className={actionClass} onClick={() => inputRef.current?.click()} disabled={restore.isPending}>
+        <Upload aria-hidden="true" />
         {t.backup.import}
         <span className="sr-only"> {t.backup.target}</span>
-      </button>
+      </Button>
       <input
         ref={inputRef}
         type="file"
@@ -74,7 +77,7 @@ export function BackupActions() {
         }}
       />
       {message && (
-        <p role="status" className="text-xs text-muted">
+        <p role="status" className="text-xs text-muted-foreground">
           {message}
         </p>
       )}

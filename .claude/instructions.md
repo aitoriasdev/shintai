@@ -23,6 +23,8 @@ Never skip a failing check, never commit with `--no-verify`, and never relax a l
 - `server/`: the local API (Hono, tsyringe, `node:sqlite`). Every dependency is injected with `@inject(token)`. The composition root is `server/container.ts`, and schema changes are new entries in `server/database/migrations.ts` (never edit a shipped migration).
 - `contracts/`: Zod schemas and inferred types shared by the API and the UI, one file per domain. The UI imports types only, so Zod stays out of the bundle.
   - The OpenAPI document (`docs/api/openapi.json`, published by Scalar) is generated from these schemas. After changing a route or a contract, run `yarn openapi`; a test fails while the file is out of date.
+- **UI components** come from [shadcn/ui](https://ui.shadcn.com/docs) where one fits: `yarn dlx shadcn@latest add <name>` copies it into `src/shared/ui/` (`components.json` maps shadcn's aliases onto FSD's `shared` layer). The copied files are ours. After adding one, replace `ring-ring/50` with `ring-ring` and `text-white` with `text-on-status`, use plain lookup objects instead of `class-variance-authority`, and keep native elements (shadcn's `NativeSelect`, not `Select`). Class names are joined with `cn` from the `cn` package.
+- **Design tokens** use shadcn's names (`background`, `foreground`, `card`, `muted`, `muted-foreground`, `primary`, `input`, `ring`, `destructive`) plus Shintai's `favorite`, `completed`, `score` and `on-status`. The values are in `src/app/styles/index.css`, with their contrast ratios.
 - **UI copy** lives in `src/shared/i18n/messages/`: `en-gb.ts` is the source (British spelling), `es-es.ts` implements the same `Messages` type. Never hard-code a string the user can see or hear; read it from `useI18n()` (or `getMessages()` outside React).
 - **Folder boundaries** (oxlint `no-restricted-imports`, overrides in `.oxlintrc.json`):
   - `src/` never imports `server/`, `zod` or `node:*`, and imports `@contracts/*` with `import type` only. Playwright files (`*.e2e.ts`, `src/shared/lib/testing/`) are exempt, because they run in Node.
@@ -51,7 +53,7 @@ The app targets **WCAG 2.1 AA**. Follow the conventions in `docs/accessibility.m
 
 - native controls first
 - toggles with constant names and `aria-pressed`
-- `border-control` for interactive boundaries
+- `border-input` for interactive boundaries
 - `announce()` and `showError()` for status messages
 - focus recovery when an interaction removes the focused element
 

@@ -2,7 +2,8 @@ import { Check, Monitor, Moon, Settings2, Sun } from 'lucide-react'
 import { useId, useState, useSyncExternalStore } from 'react'
 import { isLocale, LOCALE_NAMES, LOCALES } from '@/shared/i18n/locales'
 import { useI18n } from '@/shared/i18n/use-i18n'
-import { cn } from '@/shared/lib/cn'
+import { NativeSelect } from '@/shared/ui/native-select'
+import { cn } from 'cn'
 import { getThemePreference, setThemePreference, subscribeToTheme, type ThemePreference } from '../model/theme-store'
 
 const THEME_ICONS = { system: Monitor, light: Sun, dark: Moon } as const
@@ -20,7 +21,7 @@ function ThemePicker() {
 
   return (
     <fieldset>
-      <legend className="mb-2 text-sm font-semibold text-text">{t.preferences.theme}</legend>
+      <legend className="mb-2 text-sm font-semibold text-foreground">{t.preferences.theme}</legend>
       <div className="grid grid-cols-3 gap-2">
         {(Object.keys(THEME_ICONS) as ThemePreference[]).map((value) => {
           const Icon = THEME_ICONS[value]
@@ -28,10 +29,10 @@ function ThemePicker() {
             <label
               key={value}
               className={cn(
-                'relative flex min-h-18 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-control px-1 py-2.5 text-xs font-medium text-muted transition-colors hover:bg-surface-2 hover:text-text',
+                'relative flex min-h-18 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-input px-1 py-2.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
                 // Selected: accent ring + tint + check mark, so the state is not carried by hue alone (1.4.1).
-                'has-checked:border-accent has-checked:bg-accent/15 has-checked:text-text has-checked:ring-1 has-checked:ring-accent',
-                'has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent',
+                'has-checked:border-primary has-checked:bg-primary/15 has-checked:text-foreground has-checked:ring-1 has-checked:ring-primary',
+                'has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary',
               )}
             >
               <input
@@ -44,7 +45,7 @@ function ThemePicker() {
               />
               <Icon className="size-5" aria-hidden="true" />
               {labels[value]}
-              <Check className="absolute top-1.5 right-1.5 hidden size-3.5 text-accent peer-checked:block" aria-hidden="true" />
+              <Check className="absolute top-1.5 right-1.5 hidden size-3.5 text-primary peer-checked:block" aria-hidden="true" />
             </label>
           )
         })}
@@ -73,8 +74,8 @@ export function PreferencesMenu() {
         aria-label={t.preferences.button}
         title={t.preferences.button}
         className={cn(
-          'grid size-11 shrink-0 place-items-center rounded-full border border-control text-muted transition-colors [anchor-name:--preferences] hover:bg-surface-2 hover:text-text',
-          open && 'bg-surface-2 text-text',
+          'grid size-11 shrink-0 place-items-center rounded-full border border-input text-muted-foreground transition-colors [anchor-name:--preferences] hover:bg-muted hover:text-foreground',
+          open && 'bg-muted text-foreground',
         )}
       >
         <Settings2 className="size-5" aria-hidden="true" />
@@ -85,27 +86,28 @@ export function PreferencesMenu() {
         role="group"
         aria-label={t.preferences.button}
         onToggle={(event) => setOpen(event.newState === 'open')}
-        className="preferences-popover w-76 max-w-[calc(100vw-2rem)] space-y-5 rounded-2xl border border-control bg-surface p-4 text-text shadow-2xl"
+        className="preferences-popover w-76 max-w-[calc(100vw-2rem)] space-y-5 rounded-2xl border border-input bg-card p-4 text-foreground shadow-2xl"
       >
         <ThemePicker />
         <div className="border-t border-border pt-4">
-          <label htmlFor={languageId} className="mb-2 block text-sm font-semibold text-text">
+          <label htmlFor={languageId} className="mb-2 block text-sm font-semibold text-foreground">
             {t.preferences.language}
           </label>
-          <select
+          <NativeSelect
             id={languageId}
+            containerClassName="w-full"
             value={locale}
             onChange={(event) => {
               if (isLocale(event.target.value)) setLocale(event.target.value)
             }}
-            className="h-11 w-full rounded-xl border border-control bg-surface px-3 text-sm text-text hover:bg-surface-2"
+            className="h-11 rounded-xl bg-card text-foreground"
           >
             {LOCALES.map((option) => (
               <option key={option} value={option} lang={option}>
                 {LOCALE_NAMES[option]}
               </option>
             ))}
-          </select>
+          </NativeSelect>
         </div>
       </div>
     </>

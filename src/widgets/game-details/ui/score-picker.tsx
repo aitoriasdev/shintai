@@ -3,7 +3,7 @@ import { X } from 'lucide-react'
 import { useId, useState } from 'react'
 import { useLibraryEntry, useUpsertEntry } from '@/entities/library/api/library-queries'
 import { useI18n } from '@/shared/i18n/use-i18n'
-import { cn } from '@/shared/lib/cn'
+import { cn } from 'cn'
 
 const SCORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const
 
@@ -11,7 +11,7 @@ const SCORES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const
 function scoreColor(score: number): string {
   if (score >= 8) return 'bg-completed text-on-status'
   if (score >= 5) return 'bg-score text-on-status'
-  return 'bg-danger text-on-status'
+  return 'bg-destructive text-on-status'
 }
 
 /** Personal 1–10 score as a native radio group (arrow keys change it), plus an explicit clear button. */
@@ -37,7 +37,7 @@ export function ScorePicker({ game }: { game: GameSummary }) {
 
   return (
     <fieldset className="space-y-2">
-      <legend className="text-sm font-medium text-muted">{t.game.yourScore}</legend>
+      <legend className="text-sm font-medium text-muted-foreground">{t.game.yourScore}</legend>
       <div className="flex items-center gap-2">
         <div className="grid flex-1 grid-cols-5 gap-1 sm:grid-cols-10">
           {SCORES.map((value) => (
@@ -45,8 +45,8 @@ export function ScorePicker({ game }: { game: GameSummary }) {
               key={value}
               className={cn(
                 'relative grid h-11 cursor-pointer place-items-center rounded-lg text-sm font-bold transition-[background-color,color] duration-150',
-                'has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-accent',
-                score !== null && value <= score ? scoreColor(score) : 'bg-surface-2 text-text hover:bg-border',
+                'has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary',
+                score !== null && value <= score ? scoreColor(score) : 'bg-muted text-foreground hover:bg-border',
               )}
             >
               <input
@@ -66,7 +66,7 @@ export function ScorePicker({ game }: { game: GameSummary }) {
           type="button"
           onClick={() => setScore(null)}
           disabled={score === null}
-          className="inline-flex h-11 shrink-0 items-center gap-1 rounded-lg px-2 text-sm text-muted transition-colors hover:text-text disabled:opacity-40"
+          className="inline-flex h-11 shrink-0 items-center gap-1 rounded-lg px-2 text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-40"
         >
           <X className="size-4" aria-hidden="true" />
           {t.details.clear}

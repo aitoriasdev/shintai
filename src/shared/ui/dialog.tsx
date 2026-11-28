@@ -69,7 +69,7 @@ export function Dialog({ open, onClose, labelledBy, children }: DialogProps) {
             aria-modal="true"
             aria-labelledby={labelledBy}
             tabIndex={-1}
-            className="relative max-h-[92dvh] w-full max-w-4xl overflow-y-auto rounded-t-3xl border border-control bg-surface shadow-2xl focus:outline-none sm:rounded-3xl"
+            className="relative max-h-[92dvh] w-full max-w-4xl overflow-y-auto rounded-t-3xl border border-input bg-card shadow-2xl focus:outline-none sm:rounded-3xl"
             initial={{ y: 40, scale: 0.98 }}
             animate={{ y: 0, scale: 1 }}
             exit={{ y: 40, scale: 0.98 }}

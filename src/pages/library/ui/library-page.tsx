@@ -40,10 +40,10 @@ export function LibraryPage({ query, onOpen, onBrowse }: LibraryPageProps) {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 tabIndex={-1} className="text-3xl font-bold tracking-tight text-text focus:outline-none sm:text-4xl">
+          <h1 tabIndex={-1} className="text-3xl font-bold tracking-tight text-foreground focus:outline-none sm:text-4xl">
             {t.library.title}
           </h1>
-          <p className="mt-1 max-w-prose text-sm text-muted">{t.library.intro}</p>
+          <p className="mt-1 max-w-prose text-sm text-muted-foreground">{t.library.intro}</p>
         </div>
         <BackupActions />
       </div>
@@ -57,7 +57,7 @@ export function LibraryPage({ query, onOpen, onBrowse }: LibraryPageProps) {
       ) : entries.length === 0 ? (
         <EmptyState icon={<Library className="size-6" />} title={t.library.emptyTitle}>
           <p>{t.library.emptyHint}</p>
-          <button type="button" className="mt-3 min-h-11 font-medium text-accent hover:underline" onClick={onBrowse}>
+          <button type="button" className="mt-3 min-h-11 font-medium text-primary hover:underline" onClick={onBrowse}>
             {t.library.discoverGames}
           </button>
         </EmptyState>

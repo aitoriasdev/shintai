@@ -1,4 +1,5 @@
 import { useI18n } from '@/shared/i18n/use-i18n'
+import { NativeSelect } from '@/shared/ui/native-select'
 import { SegmentedControl } from '@/shared/ui/segmented-control'
 import type { LibraryFilters, SortKey, StatusFilter } from '../model/filter-library'
 
@@ -32,19 +33,19 @@ export function LibraryToolbar({ filters, onChange }: LibraryToolbarProps) {
         value={filters.status}
         onChange={(status) => onChange({ ...filters, status })}
       />
-      <label className="flex items-center gap-2 text-sm text-muted">
+      <label className="flex items-center gap-2 text-sm text-muted-foreground">
         {t.library.sortBy}
-        <select
+        <NativeSelect
           value={filters.sort}
           onChange={(event) => onChange({ ...filters, sort: event.target.value as SortKey })}
-          className="h-9 rounded-full border border-control bg-surface px-3 text-sm text-text pointer-coarse:h-11"
+          className="rounded-full bg-card text-foreground pointer-coarse:h-11"
         >
           {SORT_KEYS.map((key) => (
             <option key={key} value={key}>
               {sortLabels[key]}
             </option>
           ))}
-        </select>
+        </NativeSelect>
       </label>
     </div>
   )

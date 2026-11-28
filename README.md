@@ -98,7 +98,7 @@ Errors are [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) Problem Details (`
 | `entities/` | `game` (API, card, cover), `library` (API, ordered optimistic mutations, badges) |
 | `shared/`   | API client (RFC 9457 errors), `i18n` (typed en-GB/es-ES catalogues, `Intl` formatting), hooks, accessible UI primitives (dialog, skip link, live announcer, error toast), test helpers |
 
-Translations are plain typed objects: `messages/en-gb.ts` is the source and `es-es.ts` must match its shape, so a missing string is a type error. Numbers and plurals use `Intl`. Server state is handled by TanStack Query with optimistic updates; animations use Motion (`LazyMotion` + `domAnimation`); styling is Tailwind CSS v4; icons are Lucide.
+Translations are plain typed objects: `messages/en-gb.ts` is the source and `es-es.ts` must match its shape, so a missing string is a type error. Numbers and plurals use `Intl`. Server state is handled by TanStack Query with optimistic updates; animations use Motion (`LazyMotion` + `domAnimation`); styling is Tailwind CSS v4 with [shadcn/ui](https://ui.shadcn.com) components in `src/shared/ui/` and a palette of traditional Japanese colours; icons are Lucide.
 
 ## Conventions
 
@@ -107,7 +107,7 @@ Translations are plain typed objects: `messages/en-gb.ts` is the source and `es-
 - **No barrel files.** Import from the file that defines a thing (`@/entities/game/ui/game-card`). Steiger's `public-api` rules are disabled accordingly; layer rules still apply.
 - **Types live with the code that owns them**: there is no global `types.ts`.
 - **Tests sit next to the code they cover**: `*.spec.ts(x)` for Vitest, `*.e2e.ts` for Playwright.
-- **Accessibility is part of done**: native elements first, constant toggle names, `border-control` for interactive boundaries, and an `expectAccessible()` check for every new page or dialog ([guidelines](docs/accessibility.md#conventions-for-new-ui)).
+- **Accessibility is part of done**: native elements first, constant toggle names, `border-input` for interactive boundaries, and an `expectAccessible()` check for every new page or dialog ([guidelines](docs/accessibility.md#conventions-for-new-ui)).
 
 ## Data & privacy
 

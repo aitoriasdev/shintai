@@ -11,7 +11,7 @@ import { formatReleaseDate } from '@/shared/i18n/format-release-date'
 import type { Locale } from '@/shared/i18n/locales'
 import type { Messages } from '@/shared/i18n/messages/en-gb'
 import { useI18n } from '@/shared/i18n/use-i18n'
-import { cn } from '@/shared/lib/cn'
+import { cn } from 'cn'
 import { Dialog } from '@/shared/ui/dialog'
 import { LibraryButton } from './library-button'
 import { ScorePicker } from './score-picker'
@@ -21,7 +21,7 @@ const TITLE_ID = 'game-details-title'
 /** Wikipedia and Wikidata text is English whatever the UI language (3.1.2 Language of Parts). */
 const WIKIPEDIA_LANG = 'en'
 
-const pill = 'rounded-full bg-surface-2 px-2.5 py-1 text-xs text-text'
+const pill = 'rounded-full bg-muted px-2.5 py-1 text-xs text-foreground'
 
 function Facts({ details, locale, t }: { details: GameDetails; locale: Locale; t: Messages }) {
   const facts = [
@@ -39,7 +39,7 @@ function Facts({ details, locale, t }: { details: GameDetails; locale: Locale; t
       <dl className="grid gap-x-6 gap-y-4 border-t border-border pt-5 sm:grid-cols-2">
         {details.releaseDate && (
           <div>
-            <dt className="mb-1.5 text-sm font-medium text-muted">{t.details.released}</dt>
+            <dt className="mb-1.5 text-sm font-medium text-muted-foreground">{t.details.released}</dt>
             {/* Formatted in the UI language, so unlike the other facts it is not marked as English. */}
             <dd className="flex">
               <time dateTime={details.releaseDate} className={pill}>
@@ -50,7 +50,7 @@ function Facts({ details, locale, t }: { details: GameDetails; locale: Locale; t
         )}
         {visible.map(([term, values]) => (
           <div key={term}>
-            <dt className="mb-1.5 text-sm font-medium text-muted">{term}</dt>
+            <dt className="mb-1.5 text-sm font-medium text-muted-foreground">{term}</dt>
             <dd lang={WIKIPEDIA_LANG} className="flex flex-wrap gap-1.5">
               {values.map((value) => (
                 <span key={value} className={pill}>
@@ -72,21 +72,23 @@ function Body({ game }: { game: GameSummary }) {
   const extractId = useId()
 
   return (
-    <div className="grid gap-6 p-5 sm:grid-cols-[14rem_1fr] sm:p-8">
+    // From `sm` up the cover stays in place and only the information column scrolls; on phones the cover sits
+    // above the text and the whole panel scrolls, so the cover doesn't take a third of a small screen.
+    <div className="grid gap-6 p-5 sm:flex sm:max-h-[calc(92dvh-2px)] sm:gap-0 sm:p-0">
       <GameCover
         title={game.title}
         src={details.data?.coverUrl ?? game.coverUrl}
         eager
-        className="mx-auto w-40 rounded-2xl shadow-xl shadow-black/40 sm:w-full"
+        className="mx-auto w-40 rounded-2xl sm:m-8 sm:mr-0 sm:w-56 sm:shrink-0 sm:self-start"
       />
 
-      <div className="min-w-0 space-y-6">
+      <div className="min-w-0 space-y-6 sm:flex-1 sm:overflow-y-auto sm:overscroll-contain sm:p-8 sm:pl-6">
         <div className="space-y-1 pr-12">
-          <h2 id={TITLE_ID} className="text-2xl font-bold tracking-tight text-balance text-text sm:text-3xl">
+          <h2 id={TITLE_ID} className="text-2xl font-bold tracking-tight text-balance text-foreground sm:text-3xl">
             {game.title}
           </h2>
           {game.description && (
-            <p lang={WIKIPEDIA_LANG} className="text-sm text-muted">
+            <p lang={WIKIPEDIA_LANG} className="text-sm text-muted-foreground">
               {game.description}
             </p>
           )}
@@ -104,13 +106,13 @@ function Body({ game }: { game: GameSummary }) {
           <div role="status" className="space-y-2">
             <span className="sr-only">{t.details.loading}…</span>
             {[100, 95, 88, 60].map((width) => (
-              <div key={width} aria-hidden="true" className="h-3.5 animate-pulse rounded bg-surface-2 motion-reduce:animate-none" style={{ width: `${width}%` }} />
+              <div key={width} aria-hidden="true" className="h-3.5 animate-pulse rounded bg-muted motion-reduce:animate-none" style={{ width: `${width}%` }} />
             ))}
           </div>
         )}
 
         {details.isError && (
-          <p role="alert" className="text-sm text-danger">
+          <p role="alert" className="text-sm text-destructive">
             {t.details.loadError(describeError(details.error, t))}{' '}
             <button type="button" className="min-h-9 font-medium underline" onClick={() => details.refetch()}>
               {t.details.retry}
@@ -123,14 +125,14 @@ function Body({ game }: { game: GameSummary }) {
             {details.data.extract && (
               <section className="space-y-2">
                 <h3 className="sr-only">{t.details.about}</h3>
-                <p id={extractId} lang={WIKIPEDIA_LANG} className={cn('text-sm leading-relaxed whitespace-pre-line text-text', !expanded && 'line-clamp-6')}>
+                <p id={extractId} lang={WIKIPEDIA_LANG} className={cn('text-sm leading-relaxed whitespace-pre-line text-foreground', !expanded && 'line-clamp-6')}>
                   {details.data.extract}
                 </p>
                 <button
                   type="button"
                   aria-expanded={expanded}
                   aria-controls={extractId}
-                  className="min-h-9 text-sm font-medium text-accent hover:underline"
+                  className="min-h-9 text-sm font-medium text-primary hover:underline"
                   onClick={() => setExpanded((v) => !v)}
                 >
                   {expanded ? t.details.showLess : t.details.showMore}
@@ -143,7 +145,7 @@ function Body({ game }: { game: GameSummary }) {
               target="_blank"
               rel="noreferrer"
               hrefLang={WIKIPEDIA_LANG}
-              className="inline-flex min-h-9 items-center gap-1.5 text-sm text-muted underline-offset-4 hover:text-text hover:underline"
+              className="inline-flex min-h-9 items-center gap-1.5 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
             >
               {t.details.readMore}
               <span className="sr-only"> {t.details.newTab}</span>
@@ -175,7 +177,7 @@ export function GameDetailsDialog({ game, onClose }: GameDetailsDialogProps) {
             type="button"
             onClick={onClose}
             aria-label={t.app.close}
-            className="absolute top-4 right-4 z-10 grid size-11 place-items-center rounded-full bg-surface-2 text-text transition-colors hover:bg-border"
+            className="absolute top-4 right-4 z-10 grid size-11 place-items-center rounded-full bg-muted text-foreground transition-colors hover:bg-border"
           >
             <X className="size-5" aria-hidden="true" />
           </button>

@@ -1,7 +1,6 @@
 import { useI18n } from '@/shared/i18n/use-i18n'
+import { Skeleton } from '@/shared/ui/skeleton'
 import { GRID_CLASS } from './game-grid'
-
-const pulse = 'animate-pulse bg-surface-2 motion-reduce:animate-none'
 
 export function GameGridSkeleton({ count = 12, label }: { count?: number; label?: string }) {
   const { t } = useI18n()
@@ -11,9 +10,9 @@ export function GameGridSkeleton({ count = 12, label }: { count?: number; label?
       <div className={GRID_CLASS} aria-hidden="true">
         {Array.from({ length: count }, (_, i) => (
           <div key={i}>
-            <div className={`aspect-[3/4] rounded-xl ${pulse}`} />
-            <div className={`mt-3 h-3.5 w-3/4 rounded ${pulse}`} />
-            <div className={`mt-2 h-3 w-1/3 rounded ${pulse}`} />
+            <Skeleton className="aspect-[3/4] rounded-xl" />
+            <Skeleton className="mt-3 h-3.5 w-3/4 rounded" />
+            <Skeleton className="mt-2 h-3 w-1/3 rounded" />
           </div>
         ))}
       </div>

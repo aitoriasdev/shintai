@@ -118,7 +118,7 @@ export function GameGrid({ games, onOpen, label, hasMore = false, isLoadingMore 
             <button
               type="button"
               onClick={onLoadMore}
-              className="h-11 rounded-full border border-control bg-surface px-5 text-sm font-medium text-text hover:bg-surface-2"
+              className="h-11 rounded-full border border-input bg-card px-5 text-sm font-medium text-foreground hover:bg-muted"
             >
               {t.discover.loadMore}
             </button>
