@@ -8,6 +8,7 @@ import { describeError } from '@/shared/i18n/describe-error'
 import { useI18n } from '@/shared/i18n/use-i18n'
 import { announce } from '@/shared/lib/announce'
 import { useDocumentTitle } from '@/shared/lib/use-document-title'
+import { Button } from '@/shared/ui/button'
 import { EmptyState } from '@/shared/ui/empty-state'
 import { GameGrid } from '@/widgets/game-grid/ui/game-grid'
 import { GameGridSkeleton } from '@/widgets/game-grid/ui/game-grid-skeleton'
@@ -45,10 +46,10 @@ export function DiscoverPage({ query, onOpen }: DiscoverPageProps) {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 tabIndex={-1} className="text-3xl font-bold tracking-tight text-balance text-text focus:outline-none sm:text-4xl">
+          <h1 tabIndex={-1} className="text-3xl font-bold tracking-tight text-balance text-foreground focus:outline-none sm:text-4xl">
             {heading}
           </h1>
-          <p className="mt-1 max-w-prose text-sm text-muted">{t.discover.intro}</p>
+          <p className="mt-1 max-w-prose text-sm text-muted-foreground">{t.discover.intro}</p>
         </div>
         <YearSelect value={year} onChange={setYear} />
       </div>
@@ -58,9 +59,9 @@ export function DiscoverPage({ query, onOpen }: DiscoverPageProps) {
       ) : search.isError && !search.data ? (
         <EmptyState icon={<WifiOff className="size-6" />} title={t.discover.loadError}>
           <p role="alert">{describeError(search.error, t)}</p>
-          <button type="button" className="mt-3 min-h-11 font-medium text-accent hover:underline" onClick={() => search.refetch()}>
+          <Button variant="outline" className="mt-4 h-11 rounded-full px-5" onClick={() => search.refetch()}>
             {t.discover.tryAgain}
-          </button>
+          </Button>
         </EmptyState>
       ) : games.length === 0 ? (
         <EmptyState icon={<SearchX className="size-6" />} title={t.discover.noResults}>
@@ -78,16 +79,16 @@ export function DiscoverPage({ query, onOpen }: DiscoverPageProps) {
             onLoadMore={search.fetchNextPage}
           />
           {search.isFetchNextPageError && (
-            <div role="alert" className="flex flex-wrap items-center justify-center gap-3 pt-8 text-sm text-text">
+            <div role="alert" className="flex flex-wrap items-center justify-center gap-3 pt-8 text-sm text-foreground">
               <p>{t.discover.loadMoreError(search.error ? describeError(search.error, t) : '')}</p>
-              <button
-                type="button"
+              <Button
+                variant="outline"
                 disabled={search.isFetchingNextPage}
                 onClick={() => search.fetchNextPage()}
-                className="h-11 rounded-full border border-control bg-surface px-5 font-medium hover:bg-surface-2 disabled:opacity-50"
+                className="h-11 rounded-full px-5"
               >
                 {search.isFetchingNextPage ? t.discover.retrying : t.discover.tryAgain}
-              </button>
+              </Button>
             </div>
           )}
         </>

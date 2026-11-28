@@ -28,15 +28,15 @@ export const GameCard = memo(function GameCard({ game, onOpen, badges, actions }
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="group relative flex h-full flex-col rounded-xl has-[h2_button:focus-visible]:outline-2 has-[h2_button:focus-visible]:outline-offset-4 has-[h2_button:focus-visible]:outline-accent"
+      className="group relative flex h-full flex-col rounded-xl has-[h2_button:focus-visible]:outline-2 has-[h2_button:focus-visible]:outline-offset-4 has-[h2_button:focus-visible]:outline-primary"
     >
       <GameCover
         title={game.title}
         src={game.coverUrl}
         decorative
-        className="rounded-xl shadow-md ring-1 ring-border transition-[box-shadow,translate] duration-200 group-hover:-translate-y-1 group-hover:ring-2 group-hover:ring-accent motion-reduce:group-hover:translate-y-0"
+        className="rounded-xl shadow-md ring-1 ring-border transition-[box-shadow,translate] duration-200 group-hover:-translate-y-1 group-hover:ring-2 group-hover:ring-primary motion-reduce:group-hover:translate-y-0"
       />
-      <h2 className="mt-2.5 line-clamp-2 text-sm leading-snug font-semibold text-text">
+      <h2 className="mt-2.5 line-clamp-2 text-sm leading-snug font-semibold text-foreground">
         <button
           type="button"
           onClick={() => onOpen(game)}
@@ -45,7 +45,7 @@ export const GameCard = memo(function GameCard({ game, onOpen, badges, actions }
           {game.title}
         </button>
       </h2>
-      <p lang={meta.lang} className="mt-0.5 line-clamp-1 text-xs text-muted tabular-nums">
+      <p lang={meta.lang} className="mt-0.5 line-clamp-1 text-xs text-muted-foreground tabular-nums">
         {meta.text}
       </p>
       {badges && <div className="pointer-events-none absolute top-2 left-2 z-10 flex flex-col items-start gap-1">{badges}</div>}

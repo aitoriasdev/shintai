@@ -2,7 +2,7 @@ import type { GameSummary } from '@contracts/game'
 import { Heart } from 'lucide-react'
 import { useLibraryEntry, useUpsertEntry } from '@/entities/library/api/library-queries'
 import { useI18n } from '@/shared/i18n/use-i18n'
-import { cn } from '@/shared/lib/cn'
+import { cn } from 'cn'
 import { IconButton } from '@/shared/ui/icon-button'
 
 interface FavoriteButtonProps {

@@ -11,7 +11,7 @@ export function SkipLink({ targetId }: { targetId: string }) {
         event.preventDefault()
         document.getElementById(targetId)?.focus()
       }}
-      className="fixed top-3 left-3 z-60 -translate-y-24 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-on-accent focus:translate-y-0"
+      className="fixed top-3 left-3 z-60 -translate-y-24 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground focus:translate-y-0"
     >
       {t.app.skipLink}
     </a>

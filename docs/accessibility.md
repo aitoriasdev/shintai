@@ -21,7 +21,7 @@ Both themes are measured. The tokens and their ratios are also recorded in `src/
 
 | Pair | Ratio | Required |
 | --- | --- | --- |
-| Text aijiro `#ebf6f7` on background kachi-iro `#181b26` / surface `#232630` / surface-2 `#2d313b` | 15.6:1 / 13.7:1 / 11.8:1 | 4.5:1 |
+| Text aijiro `#ebf6f7` on background kachi-iro `#181b26` / card `#232630` / muted `#2d313b` | 15.6:1 / 13.7:1 / 11.8:1 | 4.5:1 |
 | Muted text kamenozoki `#c6c2b6` on surfaces | ≥ 7.3:1 | 4.5:1 |
 | Accent mizu-iro `#86aba5` on surfaces | ≥ 5.2:1 | 4.5:1 |
 | Accent on its 15 % tint | 4.6:1 | 4.5:1 |
@@ -35,7 +35,7 @@ Both themes are measured. The tokens and their ratios are also recorded in `src/
 
 | Pair | Ratio | Required |
 | --- | --- | --- |
-| Text sumi-iro `#27221f` on background `#faf3ee` / surface `#fefcfa` / surface-2 `#f6ece2` (torinoko tints) | 14.3:1 / 15.4:1 / 13.5:1 | 4.5:1 |
+| Text sumi-iro `#27221f` on background `#faf3ee` / card `#fefcfa` / muted `#f6ece2` (torinoko tints) | 14.3:1 / 15.4:1 / 13.5:1 | 4.5:1 |
 | Muted text sunezumi `#6e5f57` on surfaces | ≥ 5.2:1 | 4.5:1 |
 | Accent `#2f6e7f` (chigusa-iro, deepened toward ai-iro) on surfaces | ≥ 4.9:1 | 4.5:1 |
 | Accent on its 15 % tint | 4.6:1 | 4.5:1 |
@@ -85,7 +85,8 @@ A code review of the full PR stack found three more accessibility issues. All ar
 
 - Prefer native elements: `<button>`, `<a>`, `<select>`, radio inputs in a `fieldset`. Reach for ARIA only when no native element fits.
 - Toggles keep a constant name and expose state with `aria-pressed`. Name per-item controls with their context (`IconButton`'s `context` prop).
-- Interactive boundaries use `border-control`; never encode state in hue alone.
+- Interactive boundaries use `border-input`; never encode state in hue alone.
+- shadcn/ui components draw focus with `ring-ring` at full strength (≥ 3:1). Never use a faded ring such as `ring-ring/50`, and use `text-on-status`, not `text-white`, on status fills.
 - Interactive controls are at least 36 px (44 px on touch screens through `pointer-coarse:`). This exceeds WCAG 2.2's 24 px minimum (2.5.8) and meets the 44 px AAA target on touch.
 - Announce asynchronous results with `announce()`. Report failures with `showError()`. Global live regions must live outside the app root, which dialogs make inert.
 - When an interaction can remove the focused element, move focus somewhere sensible (see `useFocusRecovery` in the game grid).

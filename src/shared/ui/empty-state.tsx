@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/shared/ui/empty'
 
 interface EmptyStateProps {
   icon: ReactNode
@@ -8,12 +9,14 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon, title, children }: EmptyStateProps) {
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-3 py-24 text-center">
-      <div aria-hidden="true" className="grid size-14 place-items-center rounded-2xl border border-border bg-surface text-muted">
-        {icon}
-      </div>
-      <h2 className="text-lg font-semibold text-text">{title}</h2>
-      {children && <div className="text-sm text-muted">{children}</div>}
-    </div>
+    <Empty className="mx-auto max-w-md py-24">
+      <EmptyHeader>
+        <EmptyMedia variant="icon" aria-hidden="true" className="size-14 rounded-2xl border border-border bg-card text-muted-foreground">
+          {icon}
+        </EmptyMedia>
+        <EmptyTitle className="font-semibold text-foreground">{title}</EmptyTitle>
+        {children && <EmptyDescription>{children}</EmptyDescription>}
+      </EmptyHeader>
+    </Empty>
   )
 }
