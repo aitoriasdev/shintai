@@ -11,9 +11,9 @@ Never skip a failing check, never commit with `--no-verify`, and never relax a l
 ## Package management
 
 - Yarn 4 through Corepack (`packageManager` in `package.json`), with the `node-modules` linker. Never use npm or pnpm, and never create `package-lock.json` or `pnpm-lock.yaml`.
-- Yarn skips package versions published less than 24 hours ago (`npmMinimalAgeGate: 1440` in `.yarnrc.yml`). Don't override it. If `yarn add` reports a version as "quarantined", use the newest version that isn't. The gate only applies when Yarn resolves a version: a version already in `yarn.lock` is not checked again, so don't keep one that was locked too early.
+- Yarn skips package versions published less than 24 hours ago (`npmMinimalAgeGate: "1d"` in `.yarnrc.yml`). Don't override it. If `yarn add` reports a version as "quarantined", use the newest version that isn't. The gate only applies when Yarn resolves a version: a version already in `yarn.lock` is not checked again, so don't keep one that was locked too early.
 - Packages may not run install scripts (`enableScripts: false`). A package that really needs its script must be allowed one by one in `dependenciesMeta` in `package.json`; `esbuild` is marked `built: false` because its binary comes as an optional dependency.
-- Yarn rewrites `.yarnrc.yml` (sorted keys, no comments), so explain its settings here, not in the file. Check `yarn --version` prints 4.x before running Yarn: a global Yarn 1 rewrites `yarn.lock` in the old v1 format.
+- Yarn rewrites `.yarnrc.yml` (sorted keys, no comments), so explain its settings here, not in the file. The settings are documented at https://yarnpkg.com/configuration/yarnrc. Check `yarn --version` prints 4.x before running Yarn: a global Yarn 1 rewrites `yarn.lock` in the old v1 format.
 - Prefer platform features over new dependencies (e.g. `node:sqlite`). A new dependency must be widely used, actively maintained and open source.
 
 ## Where code goes
