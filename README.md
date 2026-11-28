@@ -2,7 +2,9 @@
 
 Shintai is a personal web application for documenting a lifelong gaming journey: every game you played, your personal score, whether you completed it and which ones are your favorites.
 
-It runs **only on your machine**. Your library lives in a local SQLite file; nothing is deployed anywhere.
+**Try it: [shintai-theta.vercel.app](https://shintai-theta.vercel.app)**. The hosted demo needs no account and keeps your library in your own browser.
+
+Installed locally, Shintai runs **only on your machine** and keeps your library in a local SQLite file. The demo is the same app with a read-only catalogue API; see [Hosted demo](#hosted-demo-vercel).
 
 ## Features
 
@@ -49,6 +51,7 @@ Every response carries security headers (`server/http/security-headers.ts`): a s
 | ----------------- | ---------------------------------------------------------------------- |
 | `yarn dev`        | API (`tsx watch`) + Vite dev server                                    |
 | `yarn start`      | Production build, then serve UI + API from one process                 |
+| `yarn build:vercel` | Builds the hosted demo into `.vercel/output` (see [Hosted demo](#hosted-demo-vercel)) |
 | `yarn typecheck`  | `tsc -b` for the app, the server and the tooling configs               |
 | `yarn lint`       | oxlint (incl. kebab-case file names, import cycles) + Steiger (FSD)    |
 | `yarn test`       | Vitest: component specs in real Chromium + server/contract specs in Node |
@@ -68,14 +71,19 @@ src/         React UI, organized with Feature-Sliced Design
 
 ### Server
 
-- **Composition root** in `server/container.ts`: each app instance gets its own tsyringe child container. Every dependency is injected explicitly with `@inject(token)`, so no decorator metadata emit is needed.
-- `games/`: `WikipediaClient` (Wikipedia Action API + Wikidata SPARQL, one retry on transient failures), `GameDetailsCache` (SQLite), `GameCatalogService`, routes.
+- **Composition root** in `server/container.ts`: each app instance gets its own tsyringe child container. Every dependency is injected explicitly with `@inject(token)`, so no decorator metadata emit is needed, and `server/reflect-metadata.ts` provides the three `Reflect` metadata functions tsyringe uses instead of the `reflect-metadata` package.
+- `games/`: `WikipediaClient` (Wikipedia Action API + Wikidata SPARQL, one retry on transient failures), a `DetailsCache` (SQLite locally, in memory on the demo), `GameCatalogService`, routes.
+- `covers/`: `CoverService` (fetches a cover from Wikimedia's image hosts only, then resizes it to WebP with [sharp](https://sharp.pixelplumbing.com)), routes.
 - `library/`: `LibraryRepository` (SQLite), `LibraryService` (upserts, backups), routes.
 - `database/`: connection setup (WAL) and versioned migrations (`PRAGMA user_version`), one per feature.
+- `http/`: the app (`create-app.ts`), the `localOnly()` guard, security headers and RFC 9457 error handling.
+- `openapi/`: builds the OpenAPI document from the contracts.
+- `demo/`: the hosted demo's container and app (catalogue only) and its Vercel function entry point.
 - All request input is validated with the zod schemas from `contracts/`.
 
 | Endpoint                              | Description                               |
 | ------------------------------------- | ----------------------------------------- |
+| `GET /api/health`                     | Liveness check                            |
 | `GET /api/covers?src=&w=`             | A cover from Wikimedia, resized to 240 or 480 px wide, as WebP |
 | `GET /api/games/search?q=&year=&offset=` | Search or browse the catalog           |
 | `GET /api/games/:pageId/details?qid=` | Article intro + Wikidata facts (cached)   |
@@ -96,26 +104,26 @@ Errors are [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) Problem Details (`
 | `pages/`    | `discover`, `library` (plus library-only filters, stats and backup actions)    |
 | `widgets/`  | `app-header` (incl. preferences: theme and language), `game-grid`, `game-details` (incl. score picker, library button) |
 | `features/` | `search-games`, `toggle-favorite`, `toggle-completed`                          |
-| `entities/` | `game` (API, card, cover), `library` (API, ordered optimistic mutations, badges) |
-| `shared/`   | API client (RFC 9457 errors), `i18n` (typed en-GB/es-ES catalogues, `Intl` formatting), hooks, accessible UI primitives (dialog, skip link, live announcer, error toast), test helpers |
+| `entities/` | `game` (API, card, cover), `library` (API or browser store, ordered optimistic mutations, badges) |
+| `shared/`   | API client (RFC 9457 errors), deployment config (`IS_DEMO`), `i18n` (typed en-GB/es-ES catalogues, `Intl` formatting), hooks, accessible UI primitives (dialog, skip link, live announcer, error toast), test helpers |
 
-Translations are plain typed objects: `messages/en-gb.ts` is the source and `es-es.ts` must match its shape, so a missing string is a type error. Numbers and plurals use `Intl`. Server state is handled by TanStack Query with optimistic updates; animations use Motion (`LazyMotion` + `domAnimation`); styling is Tailwind CSS v4 with [shadcn/ui](https://ui.shadcn.com) components in `src/shared/ui/` and a palette of traditional Japanese colours; icons are Lucide.
+Translations are plain typed objects: `messages/en-gb.ts` is the source and `es-es.ts` must match its shape, so a missing string is a type error. Numbers and plurals use `Intl`. Server state is handled by TanStack Query with optimistic updates; animations use Motion (`LazyMotion`, with its animation features loaded after the first paint); the library page and the details dialog are split into their own chunks (`React.lazy`) and prefetched when the browser is idle; styling is Tailwind CSS v4 with [shadcn/ui](https://ui.shadcn.com) components in `src/shared/ui/` and a palette of traditional Japanese colours; icons are Lucide.
 
 ## Hosted demo (Vercel)
 
-The repository also deploys as a public demo, so anyone can try Shintai without installing it. It differs from the local app in three ways:
+The repository also deploys as a public demo at **[shintai-theta.vercel.app](https://shintai-theta.vercel.app)**, so anyone can try Shintai without installing it. It differs from the local app in three ways:
 
 - **Library:** each visitor's library is saved in their own browser (`localStorage`), not on a server. Backups export and import as usual.
-- **API:** a Vercel function serves the read-only catalogue (`/api/games/*`, `/api/health`, `/api/openapi.json`). It has no library routes, so there is nothing to write and no localhost guard.
+- **API:** a Vercel function serves the read-only catalogue (`/api/games/*`, `/api/health`, `/api/openapi.json`). It has no library routes, so there is nothing to write and no localhost guard. Game details are cached in the function's memory instead of SQLite.
 - **Covers:** Vercel's image optimisation resizes them (`/_vercel/image`), instead of `GET /api/covers`.
 
 `yarn build:vercel` builds the app with `VITE_DEMO=true` and writes `.vercel/output` in the [Build Output API](https://vercel.com/docs/build-output-api/v3) format: the static app, the function bundled with esbuild (Vercel's own TypeScript build doesn't resolve path aliases), and the routes, security headers and image settings. `vercel.json` tells Vercel to run it.
 
 To deploy your own copy:
 
-1. In Vercel, **Add New → Project** and import the repository. `vercel.json` sets the framework, install and build commands, so leave those settings empty.
-2. Under **Environment Variables**, add `ENABLE_EXPERIMENTAL_COREPACK` = `1` (Production and Preview), so Vercel installs with the Yarn version in `packageManager`.
-3. Deploy. Every push to `main` deploys to production, and every pull request gets a preview URL.
+1. In Vercel, **Add New → Project** and import the repository. `vercel.json` sets the framework, install and build commands, so leave those settings empty and their **Override** switches off. The dashboard marks them "Overridden" because of `vercel.json`.
+2. Under **Environment Variables**, add `ENABLE_EXPERIMENTAL_COREPACK` = `1` (Production and Preview), so Vercel installs with the Yarn version in `packageManager` instead of Yarn 1.
+3. Deploy. Every push to `main` deploys to production, and every pull request gets a preview URL. Vercel Authentication's **Standard Protection** keeps previews behind a Vercel login, while the production domain stays public.
 
 ## Conventions
 
@@ -129,3 +137,5 @@ To deploy your own copy:
 ## Data & privacy
 
 The only outgoing requests are made by the local API, to Wikipedia/Wikidata (catalog data) and Wikimedia's image CDNs (cover art, resized and converted to WebP by `GET /api/covers`); the browser itself only talks to the local API. Your library never leaves `data/shintai.db`. Use **Export** on the library page to keep a backup.
+
+In the hosted demo, the catalogue requests go through the Vercel function and covers through Vercel's image optimisation. Your library stays in your browser's `localStorage`: clearing site data deletes it, so export a backup to keep it.
