@@ -5,6 +5,7 @@ import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import type { DependencyContainer } from 'tsyringe'
 import type { AppConfig } from '../config'
+import { coverRoutes } from '../covers/cover-routes'
 import { GameNotFoundError } from '../games/game-catalog-service'
 import { gamesRoutes } from '../games/games-routes'
 import { UpstreamError } from '../games/wikipedia-client'
@@ -28,6 +29,7 @@ export function createApp(container: DependencyContainer) {
   app.get('/api/health', (c) => c.json({ status: 'ok' }))
   const openApiDocument = createOpenApiDocument(packageVersion())
   app.get('/api/openapi.json', (c) => c.json(openApiDocument))
+  app.route('/api/covers', coverRoutes(container))
   app.route('/api/games', gamesRoutes(container))
   app.route('/api/library', libraryRoutes(container))
 

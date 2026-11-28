@@ -35,8 +35,8 @@ describe('security headers', () => {
       expect(csp).toContain("object-src 'none'")
       expect(csp).toContain("require-trusted-types-for 'script'")
       expect(csp).not.toContain('unsafe-inline')
-      // Wikipedia serves cover art from both hosts; a missing one shows as a game without a cover.
-      expect(csp).toContain("img-src 'self' https://upload.wikimedia.org https://thumb.wikimedia.org;")
+      // Covers come resized from our own API, so images are same-origin only.
+      expect(csp).toContain("img-src 'self';")
       expect(res.headers.get('Cross-Origin-Opener-Policy')).toBe('same-origin')
       expect(res.headers.get('Cross-Origin-Resource-Policy')).toBe('same-origin')
       expect(res.headers.get('X-Frame-Options')).toBe('DENY')

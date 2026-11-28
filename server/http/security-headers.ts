@@ -14,7 +14,7 @@ export function inlineScriptHashes(html: string): string[] {
 
 /**
  * Security headers for every response (Hono's `secureHeaders`, tightened for Shintai):
- * - a strict Content Security Policy: the app's own files, cover art from Wikimedia's CDNs, no inline code except the
+ * - a strict Content Security Policy: the app's own files, cover art through our own API, no inline code except the
  *   hashed index.html script, no framing (clickjacking), no plugins, and Trusted Types for DOM sinks;
  * - COOP and CORP `same-origin`, so other sites can neither keep a handle to this window nor embed its responses;
  * - no camera, microphone, location and similar browser features.
@@ -26,8 +26,8 @@ export function securityHeaders(scriptHashes: readonly string[]) {
       defaultSrc: ["'none'"],
       scriptSrc: ["'self'", ...scriptHashes],
       styleSrc: ["'self'"],
-      // Wikipedia serves cover art from both hosts (thumb.wikimedia.org for newer thumbnails).
-      imgSrc: ["'self'", 'https://upload.wikimedia.org', 'https://thumb.wikimedia.org'],
+      // Cover art comes resized from our own API (GET /api/covers), so no other image host is needed.
+      imgSrc: ["'self'"],
       connectSrc: ["'self'"],
       manifestSrc: ["'self'"],
       baseUri: ["'none'"],
@@ -41,8 +41,6 @@ export function securityHeaders(scriptHashes: readonly string[]) {
     crossOriginResourcePolicy: 'same-origin',
     referrerPolicy: 'no-referrer',
     xFrameOptions: 'DENY',
-    // Keep the <link rel="preconnect"> to Wikimedia's CDNs working.
-    xDnsPrefetchControl: false,
     strictTransportSecurity: false,
     permissionsPolicy: {
       camera: [],

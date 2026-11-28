@@ -22,6 +22,10 @@
       "description": "The catalogue, from English Wikipedia and Wikidata."
     },
     {
+      "name": "Covers",
+      "description": "Cover art from Wikimedia, resized and converted to WebP."
+    },
+    {
       "name": "Library",
       "description": "Your games, scores and flags, stored in SQLite."
     },
@@ -152,6 +156,84 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GameSearchPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "[validation-failed](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#validation-failed): The request is not valid.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "[forbidden-host](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#forbidden-host): The API only answers on this computer.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "[upstream-unavailable](https://github.com/aitoriasdev/shintai/blob/main/docs/api/problems.md#upstream-unavailable): Wikipedia is unavailable right now.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/covers": {
+      "get": {
+        "tags": [
+          "Covers"
+        ],
+        "operationId": "getCover",
+        "summary": "Get a cover, resized",
+        "description": "Fetches a game’s `coverUrl` from Wikimedia, shrinks it to the width (never enlarging it) and returns WebP. The response never changes for a URL, so it may be cached for a year.",
+        "parameters": [
+          {
+            "name": "src",
+            "in": "query",
+            "required": true,
+            "description": "A game’s `coverUrl`. Only HTTPS URLs on upload.wikimedia.org and thumb.wikimedia.org are accepted.",
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          {
+            "name": "w",
+            "in": "query",
+            "required": true,
+            "description": "Width in pixels: a card or the dialog at 1x or 2x pixel density.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "240",
+                "480"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The resized cover.",
+            "content": {
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }

@@ -41,7 +41,7 @@ yarn dev        # UI: http://localhost:5173 (proxies /api to the API on :4321)
 
 The server only binds to `127.0.0.1`, so it is never reachable from other machines. It also rejects requests that other websites could send from your browser while it runs: non-loopback `Host` headers (DNS rebinding), cross-site writes (CSRF) and non-JSON request bodies.
 
-Every response carries security headers (`server/http/security-headers.ts`): a strict Content Security Policy (only the app's own files and Wikimedia cover art, no inline code except the hashed theme script in `index.html`, no framing, Trusted Types), `Cross-Origin-Opener-Policy` and `Cross-Origin-Resource-Policy` set to `same-origin`, and a `Permissions-Policy` that turns off camera, microphone, location and similar features.
+Every response carries security headers (`server/http/security-headers.ts`): a strict Content Security Policy (only the app's own files, cover art included, no inline code except the hashed theme script in `index.html`, no framing, Trusted Types), `Cross-Origin-Opener-Policy` and `Cross-Origin-Resource-Policy` set to `same-origin`, and a `Permissions-Policy` that turns off camera, microphone, location and similar features.
 
 ## Scripts
 
@@ -76,6 +76,7 @@ src/         React UI, organized with Feature-Sliced Design
 
 | Endpoint                              | Description                               |
 | ------------------------------------- | ----------------------------------------- |
+| `GET /api/covers?src=&w=`             | A cover from Wikimedia, resized to 240 or 480 px wide, as WebP |
 | `GET /api/games/search?q=&year=&offset=` | Search or browse the catalog           |
 | `GET /api/games/:pageId/details?qid=` | Article intro + Wikidata facts (cached)   |
 | `GET /api/library`                    | All library entries                       |
@@ -111,4 +112,4 @@ Translations are plain typed objects: `messages/en-gb.ts` is the source and `es-
 
 ## Data & privacy
 
-The only outgoing requests are to Wikipedia/Wikidata (catalog data) and Wikimedia's image CDNs, `upload.wikimedia.org` and `thumb.wikimedia.org` (cover art). Your library never leaves `data/shintai.db`. Use **Export** on the library page to keep a backup.
+The only outgoing requests are made by the local API, to Wikipedia/Wikidata (catalog data) and Wikimedia's image CDNs (cover art, resized and converted to WebP by `GET /api/covers`); the browser itself only talks to the local API. Your library never leaves `data/shintai.db`. Use **Export** on the library page to keep a backup.
