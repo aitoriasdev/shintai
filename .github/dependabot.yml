@@ -36,6 +36,7 @@ updates:
           - '@vitest/*'
           - 'vitest-browser-react'
           - 'playwright'
+          - 'playwright-core'
           - '@playwright/*'
           - '@axe-core/*'
           - 'tailwindcss'
