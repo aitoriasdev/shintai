@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -35,12 +35,32 @@ describe('security headers', () => {
       expect(csp).toContain("object-src 'none'")
       expect(csp).toContain("require-trusted-types-for 'script'")
       expect(csp).not.toContain('unsafe-inline')
+      // Wikipedia serves cover art from both hosts; a missing one shows as a game without a cover.
+      expect(csp).toContain("img-src 'self' https://upload.wikimedia.org https://thumb.wikimedia.org;")
       expect(res.headers.get('Cross-Origin-Opener-Policy')).toBe('same-origin')
       expect(res.headers.get('Cross-Origin-Resource-Policy')).toBe('same-origin')
       expect(res.headers.get('X-Frame-Options')).toBe('DENY')
       expect(res.headers.get('X-Content-Type-Options')).toBe('nosniff')
       expect(res.headers.get('Permissions-Policy')).toContain('camera=()')
       expect(res.headers.get('Strict-Transport-Security')).toBeNull()
+    }
+  })
+
+  it('caches hashed build assets for a year and revalidates the page', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'shintai-static-'))
+    mkdirSync(join(root, 'assets'))
+    writeFileSync(join(root, 'assets', 'index-abc123.js'), 'export {}')
+    writeFileSync(join(root, 'index.html'), '<!doctype html><div id="root"></div>')
+    const app = setup(root)
+
+    const asset = await app.request('/assets/index-abc123.js')
+    expect(asset.status).toBe(200)
+    expect(asset.headers.get('Cache-Control')).toBe('public, max-age=31536000, immutable')
+    // A missing asset falls back to the page, which must not be cached as if it were the asset.
+    for (const path of ['/', '/library', '/assets/missing-abc123.js']) {
+      const page = await app.request(path)
+      expect(page.status).toBe(200)
+      expect(page.headers.get('Cache-Control')).toBe('no-cache')
     }
   })
 

@@ -11,6 +11,8 @@ interface GameCardProps {
   badges?: ReactNode
   /** Quick actions rendered over the cover (top-right). */
   actions?: ReactNode
+  /** The card is in the first row: its cover is likely the largest image on first paint (LCP). */
+  priority?: boolean
 }
 
 /**
@@ -18,7 +20,7 @@ interface GameCardProps {
  * button is the single primary control and its click area is stretched over the whole card. The cover
  * is decorative, and DOM order (title → badges → actions) matches the reading order (1.3.2).
  */
-export const GameCard = memo(function GameCard({ game, onOpen, badges, actions }: GameCardProps) {
+export const GameCard = memo(function GameCard({ game, onOpen, badges, actions, priority = false }: GameCardProps) {
   const { t } = useI18n()
   // The year reads the same in every language; Wikipedia's description is English-only, so it is a fallback.
   const meta = game.year !== null ? { text: String(game.year) } : game.description ? { text: game.description, lang: 'en' } : { text: t.game.videoGame }
@@ -33,6 +35,7 @@ export const GameCard = memo(function GameCard({ game, onOpen, badges, actions }
       <GameCover
         title={game.title}
         src={game.coverUrl}
+        priority={priority}
         decorative
         className="rounded-xl shadow-md ring-1 ring-border transition-[box-shadow,translate] duration-200 group-hover:-translate-y-1 group-hover:ring-2 group-hover:ring-accent motion-reduce:group-hover:translate-y-0"
       />

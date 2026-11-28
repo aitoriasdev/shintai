@@ -11,12 +11,16 @@ import { Spinner } from '@/shared/ui/spinner'
 
 export const GRID_CLASS = 'grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 sm:gap-x-5 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
 
-function GameGridItem({ game, onOpen }: { game: GameSummary; onOpen: (game: GameSummary) => void }) {
+/** Covers in the first row of the widest layout (6 columns) are fetched first: one of them is the LCP image. */
+const PRIORITY_COVERS = 6
+
+function GameGridItem({ game, onOpen, priority }: { game: GameSummary; onOpen: (game: GameSummary) => void; priority: boolean }) {
   const entry = useLibraryEntry(game.id)
   return (
     <GameCard
       game={game}
       onOpen={onOpen}
+      priority={priority}
       badges={<EntryBadges entry={entry} />}
       actions={
         <>
@@ -96,9 +100,9 @@ export function GameGrid({ games, onOpen, label, hasMore = false, isLoadingMore 
   return (
     <section aria-label={label}>
       <ul ref={listRef} className={GRID_CLASS} onFocus={onFocus} onBlur={onBlur}>
-        {games.map((game) => (
+        {games.map((game, index) => (
           <li key={game.id}>
-            <GameGridItem game={game} onOpen={onOpen} />
+            <GameGridItem game={game} onOpen={onOpen} priority={index < PRIORITY_COVERS} />
           </li>
         ))}
       </ul>
