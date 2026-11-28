@@ -1,6 +1,6 @@
 import { serveStatic } from '@hono/node-server/serve-static'
-import { existsSync } from 'node:fs'
-import { relative } from 'node:path'
+import { existsSync, readFileSync } from 'node:fs'
+import { join, relative } from 'node:path'
 import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
 import type { DependencyContainer } from 'tsyringe'
@@ -15,11 +15,15 @@ import { LibraryRepository } from '../library/library-repository'
 import { TOKENS } from '../tokens'
 import { localOnly } from './local-only'
 import { blankProblem, ProblemError, problemResponse, typedProblem } from './problem'
+import { inlineScriptHashes, securityHeaders } from './security-headers'
 
 export function createApp(container: DependencyContainer) {
   const config = container.resolve<AppConfig>(TOKENS.Config)
   const app = new Hono()
+  const indexHtml = join(config.staticRoot, 'index.html')
+  const scriptHashes = existsSync(indexHtml) ? inlineScriptHashes(readFileSync(indexHtml, 'utf8')) : []
 
+  app.use('*', securityHeaders(scriptHashes))
   app.use('/api/*', localOnly())
   app.get('/api/health', (c) => c.json({ status: 'ok' }))
   const openApiDocument = createOpenApiDocument(packageVersion())

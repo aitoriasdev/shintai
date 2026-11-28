@@ -41,6 +41,8 @@ yarn dev        # UI: http://localhost:5173 (proxies /api to the API on :4321)
 
 The server only binds to `127.0.0.1`, so it is never reachable from other machines. It also rejects requests that other websites could send from your browser while it runs: non-loopback `Host` headers (DNS rebinding), cross-site writes (CSRF) and non-JSON request bodies.
 
+Every response carries security headers (`server/http/security-headers.ts`): a strict Content Security Policy (only the app's own files and Wikimedia cover art, no inline code except the hashed theme script in `index.html`, no framing, Trusted Types), `Cross-Origin-Opener-Policy` and `Cross-Origin-Resource-Policy` set to `same-origin`, and a `Permissions-Policy` that turns off camera, microphone, location and similar features.
+
 ## Scripts
 
 | Script            | What it does                                                           |
