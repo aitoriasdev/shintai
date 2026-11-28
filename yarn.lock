@@ -1715,10 +1715,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hono@npm:^4.13.19":
-  version: 4.13.19
-  resolution: "hono@npm:4.13.19"
-  checksum: 10c0/883ea5fb435bb568da205ae97cff85e732ac6856d3904d16403e555daf49141a340a50da6a6bd623bd4b016d57299360988d1b3e1ca28e61a632f21ebd42320a
+"hono@npm:^4.13.22":
+  version: 4.13.22
+  resolution: "hono@npm:4.13.22"
+  checksum: 10c0/128c612d83ab19f6406716702d67fc0cbea496eaed068996c714c6f029b2d6aa3c67705c12a47cd92cb2d796c4feef37ef0253cb4961dec9a743a367d94f745a
   languageName: node
   linkType: hard
 
@@ -2409,7 +2409,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:^6.3.0"
     "@vitest/browser-playwright": "npm:^5.1.1"
     concurrently: "npm:^10.0.7"
-    hono: "npm:^4.13.19"
+    hono: "npm:^4.13.22"
     lucide-react: "npm:^1.76.0"
     motion: "npm:^14.14.0"
     oxlint: "npm:^1.95.0"
