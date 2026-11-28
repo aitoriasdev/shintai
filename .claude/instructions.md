@@ -61,6 +61,7 @@ The app targets **WCAG 2.1 AA**. Follow the conventions in `docs/accessibility.m
   - non-JSON request bodies
 
   Don't weaken it.
+- Every response gets the security headers from `server/http/security-headers.ts` (strict CSP with Trusted Types, COOP/CORP `same-origin`, `Permissions-Policy`). Never add `'unsafe-inline'`, `'unsafe-eval'` or a wildcard source. Inline scripts in `index.html` are allowed by a hash the server computes at startup, so editing them needs no policy change. A new external origin (images, API calls) needs its directive updated; `security-headers.e2e.ts` fails on any CSP or Trusted Types violation.
 - Validate every request with the Zod schemas from `contracts/`.
 - Every error response is RFC 9457 Problem Details (`application/problem+json`). Throw `ProblemError` with a type from `PROBLEM_TYPES` in `contracts/problem.ts`; see the `error-messages` skill.
 
