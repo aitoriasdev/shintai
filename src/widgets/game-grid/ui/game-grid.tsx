@@ -11,12 +11,19 @@ import { Spinner } from '@/shared/ui/spinner'
 
 export const GRID_CLASS = 'grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 sm:gap-x-5 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
 
-function GameGridItem({ game, onOpen }: { game: GameSummary; onOpen: (game: GameSummary) => void }) {
+/**
+ * The first covers are fetched first, because one of them is the LCP image. Only two: that is the first row on a phone,
+ * and more high-priority images would compete for a slow connection and delay the LCP.
+ */
+const PRIORITY_COVERS = 2
+
+function GameGridItem({ game, onOpen, priority }: { game: GameSummary; onOpen: (game: GameSummary) => void; priority: boolean }) {
   const entry = useLibraryEntry(game.id)
   return (
     <GameCard
       game={game}
       onOpen={onOpen}
+      priority={priority}
       badges={<EntryBadges entry={entry} />}
       actions={
         <>
@@ -96,9 +103,9 @@ export function GameGrid({ games, onOpen, label, hasMore = false, isLoadingMore 
   return (
     <section aria-label={label}>
       <ul ref={listRef} className={GRID_CLASS} onFocus={onFocus} onBlur={onBlur}>
-        {games.map((game) => (
+        {games.map((game, index) => (
           <li key={game.id}>
-            <GameGridItem game={game} onOpen={onOpen} />
+            <GameGridItem game={game} onOpen={onOpen} priority={index < PRIORITY_COVERS} />
           </li>
         ))}
       </ul>

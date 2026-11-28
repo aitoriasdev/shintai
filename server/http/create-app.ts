@@ -43,6 +43,15 @@ export function createApp(container: DependencyContainer) {
   // Production: serve the built SPA (`yarn start`). In development Vite serves it instead.
   if (existsSync(config.staticRoot)) {
     const root = relative(process.cwd(), config.staticRoot)
+    // Built assets have a content hash in their names, so a URL never changes content: cache them for a year.
+    // Everything else, index.html above all, is revalidated so a new build is picked up straight away. The HTML
+    // fallback for an unknown path (even one under /assets/) is never cached for long.
+    app.use('*', async (c, next) => {
+      await next()
+      if (c.req.path.startsWith('/api/') || !c.res.ok) return
+      const isAsset = c.req.path.startsWith('/assets/') && !c.res.headers.get('Content-Type')?.startsWith('text/html')
+      c.header('Cache-Control', isAsset ? 'public, max-age=31536000, immutable' : 'no-cache')
+    })
     app.use('*', serveStatic({ root }))
     app.get('*', serveStatic({ root, path: 'index.html' }))
   }

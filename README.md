@@ -111,4 +111,4 @@ Translations are plain typed objects: `messages/en-gb.ts` is the source and `es-
 
 ## Data & privacy
 
-The only outgoing requests are to Wikipedia/Wikidata (catalog data) and Wikimedia's image CDN (cover art). Your library never leaves `data/shintai.db`. Use **Export** on the library page to keep a backup.
+The only outgoing requests are to Wikipedia/Wikidata (catalog data) and Wikimedia's image CDNs, `upload.wikimedia.org` and `thumb.wikimedia.org` (cover art). Your library never leaves `data/shintai.db`. Use **Export** on the library page to keep a backup.

@@ -9,12 +9,14 @@ interface GameCoverProps {
   className?: string
   /** Load eagerly (e.g. inside a dialog) instead of lazily. */
   eager?: boolean
+  /** The largest image on first paint (the first covers of a grid): load it eagerly and before other images. */
+  priority?: boolean
   /** Hide from assistive tech when the title is already next to the cover (1.1.1). */
   decorative?: boolean
 }
 
 /** Box art with a lazy, fade-in image, and a "no image" icon when there is no cover or it fails to load. */
-export function GameCover({ title, src, className, eager = false, decorative = false }: GameCoverProps) {
+export function GameCover({ title, src, className, eager = false, priority = false, decorative = false }: GameCoverProps) {
   const { t } = useI18n()
   const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading')
   // A new source (e.g. the dialog swapping the thumbnail for a larger image) deserves a fresh attempt.
@@ -31,7 +33,8 @@ export function GameCover({ title, src, className, eager = false, decorative = f
         <img
           src={src}
           alt={decorative ? '' : t.game.coverAlt(title)}
-          loading={eager ? 'eager' : 'lazy'}
+          loading={eager || priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : undefined}
           decoding="async"
           onLoad={() => setStatus('loaded')}
           onError={() => setStatus('error')}
