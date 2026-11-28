@@ -46,3 +46,6 @@ __screenshots__
 
 # local SQLite database
 data
+
+# Vercel build output (yarn build:vercel)
+.vercel

@@ -3,6 +3,7 @@ import { Library, SearchX } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useLibraryEntries } from '@/entities/library/api/library-queries'
 import { describeError } from '@/shared/i18n/describe-error'
+import { IS_DEMO } from '@/shared/config/deployment'
 import { useI18n } from '@/shared/i18n/use-i18n'
 import { announce } from '@/shared/lib/announce'
 import { useDocumentTitle } from '@/shared/lib/use-document-title'
@@ -43,7 +44,7 @@ export function LibraryPage({ query, onOpen, onBrowse }: LibraryPageProps) {
           <h1 tabIndex={-1} className="text-3xl font-bold tracking-tight text-foreground focus:outline-none sm:text-4xl">
             {t.library.title}
           </h1>
-          <p className="mt-1 max-w-prose text-sm text-muted-foreground">{t.library.intro}</p>
+          <p className="mt-1 max-w-prose text-sm text-muted-foreground">{IS_DEMO ? t.library.introDemo : t.library.intro}</p>
         </div>
         <BackupActions />
       </div>

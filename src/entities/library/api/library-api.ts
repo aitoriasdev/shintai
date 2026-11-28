@@ -1,16 +1,15 @@
 import type { GameSummary } from '@contracts/game'
-import type { EntryPatch, ImportResult, LibraryBackup, LibraryEntry } from '@contracts/library'
-import { apiRequest } from '@/shared/api/api-client'
+import type { EntryPatch, LibraryBackup } from '@contracts/library'
+import { IS_DEMO } from '@/shared/config/deployment'
+import { apiLibraryStore } from './api-library-store'
+import { browserLibraryStore } from './browser-library-store'
+import type { LibraryStore } from './library-store'
 
-export const LIBRARY_BACKUP_URL = '/api/library/backup'
+/** The local app keeps the library in the API; the hosted demo in each visitor's browser. */
+const store: LibraryStore = IS_DEMO ? browserLibraryStore : apiLibraryStore
 
-export const fetchLibrary = (signal?: AbortSignal) => apiRequest<LibraryEntry[]>('/api/library', { signal })
-
-export const upsertEntry = (game: GameSummary, patch: EntryPatch) =>
-  apiRequest<LibraryEntry>(`/api/library/${encodeURIComponent(game.id)}`, { method: 'PUT', body: { game, patch } })
-
-export const removeEntry = (gameId: string) =>
-  apiRequest<void>(`/api/library/${encodeURIComponent(gameId)}`, { method: 'DELETE' })
-
-export const importBackup = (backup: LibraryBackup) =>
-  apiRequest<ImportResult>(LIBRARY_BACKUP_URL, { method: 'POST', body: backup })
+export const fetchLibrary = (signal?: AbortSignal) => store.list(signal)
+export const upsertEntry = (game: GameSummary, patch: EntryPatch) => store.upsert(game, patch)
+export const removeEntry = (gameId: string) => store.remove(gameId)
+export const exportBackup = () => store.exportBackup()
+export const importBackup = (backup: LibraryBackup) => store.importBackup(backup)

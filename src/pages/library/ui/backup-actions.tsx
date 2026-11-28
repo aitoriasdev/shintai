@@ -1,34 +1,16 @@
-import type { LibraryBackup } from '@contracts/library'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Download, Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { importBackup, LIBRARY_BACKUP_URL } from '@/entities/library/api/library-api'
+import { exportBackup, importBackup } from '@/entities/library/api/library-api'
 import { libraryQueries } from '@/entities/library/api/library-queries'
+import { InvalidBackupError } from '@/entities/library/lib/invalid-backup-error'
 import { ApiError } from '@/shared/api/api-client'
 import { describeError } from '@/shared/i18n/describe-error'
-import type { Messages } from '@/shared/i18n/messages/en-gb'
 import { useI18n } from '@/shared/i18n/use-i18n'
 import { Button } from '@/shared/ui/button'
-
-// Pill-shaped outline buttons, 36px tall (44px on touch screens, 2.5.5).
-const actionClass = 'rounded-full pointer-coarse:h-11'
-
-/** A problem with the chosen file itself, already worded for the user. */
-class BackupFileError extends Error {}
-
-async function readBackup(file: File, t: Messages) {
-  let json: unknown
-  try {
-    json = JSON.parse(await file.text())
-  } catch (error) {
-    throw new BackupFileError(t.backup.invalidJson, { cause: error })
-  }
-  // Cheap shape check for a friendly message; the API validates the full schema.
-  if (typeof json !== 'object' || json === null || (json as { app?: unknown }).app !== 'shintai') {
-    throw new BackupFileError(t.backup.notBackup)
-  }
-  return importBackup(json as LibraryBackup)
-}
+import { BackupFileError } from '../lib/backup-file-error'
+import { downloadBackup } from '../lib/download-backup'
+import { readBackupFile } from '../lib/read-backup-file'
 
 /** Download the library as JSON, or merge a previous backup into it. */
 export function BackupActions() {
@@ -38,27 +20,31 @@ export function BackupActions() {
   const [message, setMessage] = useState<string | null>(null)
 
   const restore = useMutation({
-    mutationFn: (file: File) => readBackup(file, t),
+    mutationFn: async (file: File) => importBackup(await readBackupFile(file, t)),
     onSuccess: ({ added, updated, skipped }) => setMessage(t.backup.imported(added, updated, skipped)),
     onError: (error) => {
       if (error instanceof BackupFileError) setMessage(error.message)
-      // The API validates every entry; the import is all-or-nothing.
-      else if (error instanceof ApiError && error.slug === 'validation-failed') setMessage(t.backup.invalidEntries)
+      // The library store validates every entry; the import is all or nothing.
+      else if (error instanceof InvalidBackupError || (error instanceof ApiError && error.slug === 'validation-failed')) setMessage(t.backup.invalidEntries)
       else setMessage(describeError(error, t))
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: libraryQueries.list().queryKey }),
   })
 
+  const save = useMutation({
+    mutationFn: exportBackup,
+    onSuccess: downloadBackup,
+    onError: (error) => setMessage(describeError(error, t)),
+  })
+
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Button asChild variant="outline" className={actionClass}>
-        <a href={LIBRARY_BACKUP_URL} download>
-          <Download aria-hidden="true" />
-          {t.backup.export}
-          <span className="sr-only"> {t.backup.target}</span>
-        </a>
+      <Button variant="outline" className="rounded-full pointer-coarse:h-11" onClick={() => save.mutate()} disabled={save.isPending}>
+        <Download aria-hidden="true" />
+        {t.backup.export}
+        <span className="sr-only"> {t.backup.target}</span>
       </Button>
-      <Button variant="outline" className={actionClass} onClick={() => inputRef.current?.click()} disabled={restore.isPending}>
+      <Button variant="outline" className="rounded-full pointer-coarse:h-11" onClick={() => inputRef.current?.click()} disabled={restore.isPending}>
         <Upload aria-hidden="true" />
         {t.backup.import}
         <span className="sr-only"> {t.backup.target}</span>

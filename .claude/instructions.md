@@ -37,6 +37,10 @@ Never skip a failing check, never commit with `--no-verify`, and never relax a l
 - **No barrel files.** Never create an `index.ts` (or any file) that re-exports other modules. Import from the file that defines the value (`@/entities/game/ui/game-card`).
 - **Types live with the code that owns them.** There is no global `types.ts`.
 
+## Hosted demo
+
+`yarn build:vercel` builds the public demo on Vercel (README, "Hosted demo"). It reuses the catalogue code through `server/demo/`, with no database: libraries live in the visitor's browser (`browserLibraryStore`, chosen by `IS_DEMO`) and covers use Vercel's image optimisation. Keep both deployments working: a change to the library API needs the same behaviour in `browser-library-store.ts`, and a change to `libraryBackupSchema` needs `is-library-backup.ts` updated.
+
 ## Testing
 
 - **Tests sit next to the code they test.**
