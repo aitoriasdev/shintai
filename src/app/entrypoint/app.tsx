@@ -1,17 +1,20 @@
 import type { GameSummary } from '@contracts/game'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Suspense, useCallback, useRef, useState } from 'react'
 import { useLibraryEntries } from '@/entities/library/api/library-queries'
 import { SearchField } from '@/features/search-games/ui/search-field'
 import { DiscoverPage } from '@/pages/discover/ui/discover-page'
-import { LibraryPage } from '@/pages/library/ui/library-page'
 import { useI18n } from '@/shared/i18n/use-i18n'
 import { useDebouncedValue } from '@/shared/lib/use-debounced-value'
+import { useFocusHeadingOnChange } from '@/shared/lib/use-focus-heading-on-change'
+import { useHasBeenTruthy } from '@/shared/lib/use-has-been-truthy'
+import { useWhenIdle } from '@/shared/lib/use-when-idle'
 import { ErrorToast } from '@/shared/ui/error-toast'
 import { LiveAnnouncer } from '@/shared/ui/live-announcer'
 import { SkipLink } from '@/shared/ui/skip-link'
+import { Spinner } from '@/shared/ui/spinner'
 import { AppHeader } from '@/widgets/app-header/ui/app-header'
-import { GameDetailsDialog } from '@/widgets/game-details/ui/game-details-dialog'
 import { useHashView } from '../routing/use-hash-view'
+import { GameDetailsDialog, LibraryPage, prefetchLazyViews } from './lazy-views'
 
 const MAIN_ID = 'main'
 
@@ -23,14 +26,10 @@ export function App() {
   const discoverQuery = useDebouncedValue(search.discover, 350)
   const libraryCount = useLibraryEntries().data?.length
   const mainRef = useRef<HTMLElement>(null)
-  const previousView = useRef(view)
-
-  // 2.4.3: after switching views, move focus to the new page heading (not on first load).
-  useEffect(() => {
-    if (previousView.current === view) return
-    previousView.current = view
-    mainRef.current?.querySelector<HTMLElement>('h1')?.focus()
-  }, [view])
+  useFocusHeadingOnChange(view, mainRef)
+  // The dialog chunk loads on the first open; after that the dialog stays mounted so it can animate out.
+  const dialogUsed = useHasBeenTruthy(selected)
+  useWhenIdle(prefetchLazyViews)
 
   const closeDetails = useCallback(() => setSelected(null), [])
   const browse = useCallback(() => setView('discover'), [setView])
@@ -55,10 +54,16 @@ export function App() {
         {view === 'discover' ? (
           <DiscoverPage query={discoverQuery} onOpen={setSelected} />
         ) : (
-          <LibraryPage query={search.library} onOpen={setSelected} onBrowse={browse} />
+          <Suspense fallback={<Spinner label={t.library.loading} />}>
+            <LibraryPage query={search.library} onOpen={setSelected} onBrowse={browse} />
+          </Suspense>
         )}
       </main>
-      <GameDetailsDialog game={selected} onClose={closeDetails} />
+      {dialogUsed && (
+        <Suspense fallback={null}>
+          <GameDetailsDialog game={selected} onClose={closeDetails} />
+        </Suspense>
+      )}
       <LiveAnnouncer />
       <ErrorToast />
     </>
